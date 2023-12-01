@@ -232,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) =>
-                                ForgotPassEmailVerify()));
+                                ForgotPassMobileVerify()));
                       },
                       child: const Text(
                         'Forgot Password?',

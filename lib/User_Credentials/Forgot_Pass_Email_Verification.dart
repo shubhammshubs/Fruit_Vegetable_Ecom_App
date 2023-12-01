@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -6,16 +7,16 @@ import 'Forgot_Password_OTP_Screen.dart';
 
 
 // Code for Entering the number and sending the OTP for Forget Password page
-class ForgotPassEmailVerify extends StatefulWidget {
-  const ForgotPassEmailVerify({super.key});
+class ForgotPassMobileVerify extends StatefulWidget {
+  const ForgotPassMobileVerify({super.key});
 
   static String verify="";
 
   @override
-  State<ForgotPassEmailVerify> createState() => _ForgotPassEmailVerify();
+  State<ForgotPassMobileVerify> createState() => _ForgotPassMobileVerify();
 }
 
-class _ForgotPassEmailVerify extends State<ForgotPassEmailVerify> {
+class _ForgotPassMobileVerify extends State<ForgotPassMobileVerify> {
   TextEditingController countrycode = TextEditingController();
   var _mobileController="";
   bool showProgressIndicator = false; // Declare the variable
@@ -49,34 +50,73 @@ class _ForgotPassEmailVerify extends State<ForgotPassEmailVerify> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset('assets/images/orange_2.jpg',
 
-              const SizedBox(height: 10,),
+                width: 480,
+                height: 180,
+              ),
+              const SizedBox(height: 40,),
 
-              const Text('Email Verification',
+              const Text('User Verification',
                 style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),),
 
               const SizedBox(height: 10,),
-              const Text('We need to verify your Email before Reseating Password !',
+              const Text('We need to verify your Mobile before Reseating Password !',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,),
               const SizedBox(height: 30,),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
+                child: Container(
+                  height: 55,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.grey),
+                    borderRadius: BorderRadius.circular(3),
                   ),
-                  onChanged: (String value){
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Icon(
+                          Icons.mobile_friendly,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 40,
 
-                  },
-                  validator: (value){
-                    return value!.isEmpty ? 'Please  Enter Email' : null;
-                  },
+                        child: TextField(
+                          readOnly: true,
+                          controller: countrycode,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "|",
+                        style: TextStyle(fontSize: 33, color: Colors.grey),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          onChanged: (value) {
+                            // setState(() {
+                            _mobileController = value;
+                            // }
+                            // );
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Phone',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 20,),
@@ -91,14 +131,53 @@ class _ForgotPassEmailVerify extends State<ForgotPassEmailVerify> {
                       child: ElevatedButton(
                         onPressed: () async {
 
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) =>
-                                  ForgotPassOTP()));
+                          await FirebaseAuth.instance.verifyPhoneNumber(
+                              phoneNumber: '${countrycode.text+_mobileController}',
 
+                              verificationCompleted: (PhoneAuthCredential credential) {
+                                setState(() {
+                                  showProgressIndicator = false; // Verification is complete, hide the indicator
+                                });
+                              },
+                              verificationFailed: (FirebaseAuthException e) {
+                                String errorMessage = e.message?? 'An error occurred';  // Get the error message from FirebaseAuthException
+                                print('Firebase verification error: $errorMessage');
+                                Fluttertoast.showToast(
+                                  msg: errorMessage,
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.green,
+                                  textColor: Colors.white,
+
+                                  fontSize: 16.0,
+                                );
+                                setState(() {
+                                  showProgressIndicator = false; // Verification failed, hide the indicator
+                                });
+                              },
+                              codeSent: (String verificationId, int? resendToken) {
+
+                                ForgotPassMobileVerify.verify=verificationId;
+                                setState(() {
+                                  showProgressIndicator = false; // Code sent, hide the indicator
+                                });
+                                // Navigator.pushNamed(context, "otp");
+
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context) => ForgotPassOTP(
+                                    mobileNumber: _mobileController,
+                                  ),),
+                                );
+
+                              },
+                              codeAutoRetrievalTimeout: (String verificationId) {},
+                          );
                           setState(() {
-                            showProgressIndicator = true; // Start the verification, show the indicator
+                          showProgressIndicator = true; // Start the verification, show the indicator
                           });
                           // Navigator.pushNamed(context, "otp");
+
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -108,7 +187,7 @@ class _ForgotPassEmailVerify extends State<ForgotPassEmailVerify> {
                         ),
                         child: const Text('Send the code',
                           style: TextStyle(
-                            // color: Colors.,
+                            color: Colors.white,
                             fontSize: 16,
                           ),),
                       ),

@@ -73,7 +73,7 @@ class _SignupVerifyOTPState extends State<SignupVerifyOTP> {
               style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),),
 
               const SizedBox(height: 10,),
-              const Text('We need to register your phone before getting started !',
+              const Text('Please enter the code we just sent to Mobile Number!',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,),
               const SizedBox(height: 30,),
