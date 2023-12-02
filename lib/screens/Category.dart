@@ -68,12 +68,13 @@ class CategoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigate to ProductListPage and pass the selected category
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductListPage(category: category.name),
+            builder: (context) => ProductListPage(productCategory: category.name),
           ),
+
         );
       },
       child: Column(
@@ -103,19 +104,19 @@ class CategoryItem extends StatelessWidget {
 
 // Define your list of categories with Font Awesome icons
 final List<Category> categories = [
-  Category(name: "Vegetables", icon: FontAwesomeIcons.basketShopping),
+  Category(name: "Vegetable", icon: FontAwesomeIcons.basketShopping),
   Category(name: "Fruits", icon: FontAwesomeIcons.appleWhole),
-  Category(name: "Milk", icon: FontAwesomeIcons.glassWaterDroplet),
-  Category(name: "Drinks", icon: FontAwesomeIcons.mugHot),
-  Category(name: "Cake", icon: FontAwesomeIcons.cakeCandles),
-  Category(name: 'Ice-Cream', icon: FontAwesomeIcons.iceCream),
-  Category(name: 'Bakery', icon: FontAwesomeIcons.breadSlice),
-  Category(name: 'Snacks', icon: FontAwesomeIcons.cookie),
-  Category(name: 'Grain', icon: FontAwesomeIcons.breadSlice),
-  Category(name: 'Cheese', icon: FontAwesomeIcons.cheese),
-  Category(name: 'Household', icon: FontAwesomeIcons.houseChimney),
-  Category(name: 'Pet Food', icon: FontAwesomeIcons.paw),
-  Category(name: 'Dry Fruits', icon: FontAwesomeIcons.seedling),
-  Category(name: 'Sugar', icon: FontAwesomeIcons.cubesStacked),
-  Category(name: 'Gardening', icon: FontAwesomeIcons.pagelines),
+  // Category(name: "Milk", icon: FontAwesomeIcons.glassWaterDroplet),
+  // Category(name: "Drinks", icon: FontAwesomeIcons.mugHot),
+  // Category(name: "Cake", icon: FontAwesomeIcons.cakeCandles),
+  // Category(name: 'Ice-Cream', icon: FontAwesomeIcons.iceCream),
+  // Category(name: 'Bakery', icon: FontAwesomeIcons.breadSlice),
+  // Category(name: 'Snacks', icon: FontAwesomeIcons.cookie),
+  // Category(name: 'Grain', icon: FontAwesomeIcons.breadSlice),
+  // Category(name: 'Cheese', icon: FontAwesomeIcons.cheese),
+  // Category(name: 'Household', icon: FontAwesomeIcons.houseChimney),
+  // Category(name: 'Pet Food', icon: FontAwesomeIcons.paw),
+  // Category(name: 'Dry Fruits', icon: FontAwesomeIcons.seedling),
+  // Category(name: 'Sugar', icon: FontAwesomeIcons.cubesStacked),
+  // Category(name: 'Gardening', icon: FontAwesomeIcons.pagelines),
 ];
