@@ -143,22 +143,22 @@ class HomeScreen extends StatelessWidget {
                       categories[1]), // Display the first category
                     ),
                     // SizedBox(width: 14,),
-                    Container(
-                      height: 120.0,
-                      child: CategoryItem(category:
-                      categories[2]), // Display the first category
-                    ),
+                    // Container(
+                    //   height: 120.0,
+                    //   child: CategoryItem(category:
+                    //   categories[2]), // Display the first category
+                    // ),
                     // SizedBox(width: 14,),
-                    Container(
-                      height: 120.0,
-                      child: CategoryItem(category:
-                      categories[3]), // Display the first category
-                    ),
-                    Container(
-                      height: 120.0,
-                      child: CategoryItem(category:
-                      categories[4]), // Display the first category
-                    ),
+                    // Container(
+                    //   height: 120.0,
+                    //   child: CategoryItem(category:
+                    //   categories[3]), // Display the first category
+                    // ),
+                    // Container(
+                    //   height: 120.0,
+                    //   child: CategoryItem(category:
+                    //   categories[4]), // Display the first category
+                    // ),
                   ],
                 ),
 

@@ -30,7 +30,7 @@ class CategoryPage extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, // 4 categories in each row
+                crossAxisCount: 2, // 4 categories in each row
                 crossAxisSpacing: 1.0, // Adjust as needed
                 mainAxisSpacing: 16.0, // Adjust as needed
               ),
