@@ -323,6 +323,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../HomePage1.dart';
 import '../Screens/Home_screen.dart';
+import '../screens/my_cart.dart';
 import 'login_Screen.dart';
 
 
@@ -419,7 +420,7 @@ class _RegistrationPageState extends State<SignUpScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(
+            builder: (context) => MyCartPage(
               // mobileNumber: _mobileController.text,
             ),
           ),

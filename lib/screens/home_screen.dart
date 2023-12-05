@@ -89,9 +89,12 @@ class HomeScreen extends StatelessWidget {
             // -----------------------------Image slider Code-------------------------------
 
             Container(
-                child: ImageSlider(),
+                child:
+                PopularItems1Slider(productCategory: 'Vegetable',),
+                // ImageSlider(),
             ),
             // -----------------------------Image slider Category Section Code-------------------------------
+            SizedBox(height: 25,),
 
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +103,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Category',
+                      '  Category',
                       style: TextStyle(
                         fontSize: 25,
                         color: Colors.black,
@@ -179,7 +182,9 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 6,),
                 Container(
                   height: 250.0, // Set a suitable height
-                  child: BestDealsSlider(),
+                  child:
+                  // BestDealsSlider(productCategory: 'Vegetable',),
+                  BestDealsSlider(),
                 ),
               ],
             ),

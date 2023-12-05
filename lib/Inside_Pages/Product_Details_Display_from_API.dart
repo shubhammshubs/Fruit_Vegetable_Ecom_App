@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../APi/Category_vegitable_API.dart';
+import '../APi/Product_class.dart';
 import '../widgets/popular_items_slider.dart';
 
 class ProductDetailsPageFromAPI extends StatefulWidget {
@@ -115,12 +118,18 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
               child:
               // Text('image: ${widget.product.image}'),
               // Image.network('https://apip.trifrnd.com/fruits/${widget.product.image}'),
-              Image.network(
-                'https://apip.trifrnd.com/fruits/${widget.product.image}',
-                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+              CachedNetworkImage(
+                imageUrl: ImageHelper.getProductImageUrl(widget.product.image),
+                width: screenWidth, // Set a suitable width
+                height: 200.0, // Set a suitable height
+                placeholder: (BuildContext context, String url) {
+                  // You can return a widget to be displayed while the image is loading
+                  return Container(
+                    color: Colors.grey, // Placeholder color
+                  );
+                },
+                errorWidget: (BuildContext context, String url, dynamic error) {
                   // You can return a widget to be displayed when an error occurs
-                  // double screenWidth = MediaQuery.of(context).size.width;
-
                   return Container(
                     width: screenWidth, // Set a suitable width
                     height: 200.0, // Set a suitable height
@@ -131,7 +140,28 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
                     ),
                   );
                 },
+                cacheManager: DefaultCacheManager(),
+
               ),
+              // Image.network(
+              //   ImageHelper.getProductImageUrl(widget.product.image),
+              //
+              //   // 'https://apip.trifrnd.com/fruits/${widget.product.image}',
+              //   errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+              //     // You can return a widget to be displayed when an error occurs
+              //     // double screenWidth = MediaQuery.of(context).size.width;
+              //
+              //     return Container(
+              //       width: screenWidth, // Set a suitable width
+              //       height: 200.0, // Set a suitable height
+              //       color: Colors.white70, // Placeholder color
+              //       child: Icon(
+              //         Icons.error,
+              //         color: Colors.red, // Error icon color
+              //       ),
+              //     );
+              //   },
+              // ),
             ),
 
             // Product Title
@@ -251,7 +281,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'More Items',
+                  ' More Items',
                   style: TextStyle(fontSize: 25,
                       color: Colors.black,
                       fontFamily: "NexaRegular"),

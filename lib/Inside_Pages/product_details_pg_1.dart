@@ -1,6 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 // import '../Classes/CartItem_Class.dart';
+import '../APi/Product_class.dart';
 import '../screens/FavoritesScreen.dart';
 import '../screens/my_cart.dart';
 import '../widgets/popular_items_slider.dart';
@@ -126,12 +129,20 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               height: 300.0, // Adjust the height as needed
               color: Colors.grey[100], // Replace with the off-white color you prefer
               child: PageView.builder(
-                itemCount: widget.product.images.length,
+                itemCount: widget.product.image.length,
                 itemBuilder: (context, index) {
-                  return Image.asset(
-                    widget.product.images[index],
+                  return CachedNetworkImage(
+                    imageUrl: widget.product.image[index],
+                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                     fit: BoxFit.fill,
+                    cacheManager: DefaultCacheManager(),
+
                   );
+                  // return Image.asset(
+                  //   widget.product.images[index],
+                  //   fit: BoxFit.fill,
+                  // );
                 },
               ),
             ),
@@ -142,7 +153,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    widget.product.name, // Display the product name
+                    widget.product.title, // Display the product name
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -237,7 +248,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             SizedBox(height: 6,),
             Container(
-              height: 1.0,            // Height of the line
+              height: 1.0,
+              width: 2.0,// Height of the line
               color: Colors.black,    // Color of the line
               margin: EdgeInsets.symmetric(vertical: 10.0), // Optional margin to adjust spacing
             ),
@@ -247,7 +259,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'More Items',
+                  '   More Items',
                   style: TextStyle(fontSize: 25, color: Colors.black, fontFamily: "NexaRegular"),
                 ),
                 SizedBox(height: 6,),

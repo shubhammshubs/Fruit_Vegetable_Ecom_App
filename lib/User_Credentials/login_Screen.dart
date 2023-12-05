@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../HomePage1.dart';
+import '../screens/my_cart.dart';
 import 'Forgot_Pass_Email_Verification.dart';
 import 'Signup_verification.dart';
 
@@ -68,8 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(
-              // mobileNumber: _mobileController.text,
+            builder: (context) => MyCartPage(
+              mobileNumber: _mobileController.text,
             ),
           ),
         );

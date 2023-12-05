@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../APi/Category_vegitable_API.dart';
+import '../APi/Product_class.dart';
 import '../widgets/best_deals_slider.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,7 +39,7 @@ class _ProductListPageState extends State<ProductListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductDetailsPageFromAPI(product: product),
+        builder: (context) => ProductDetailsPageFromAPI(product: product)
       ),
     );
   }
@@ -77,21 +80,42 @@ class _ProductListPageState extends State<ProductListPage> {
                           leading: Container(
                             width: 50.0, // Set a suitable width for the image
                             height: 100.0, // Set a suitable height for the image
-                            child: Image.network(
-                              'https://apip.trifrnd.com/fruits/${products[index].image}',
-                              errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                                return Container(
-                                  color: Colors.white70,
-                                  child: Icon(
-                                    Icons.error,
-                                    color: Colors.red,
-                                  ),
-                                );
-                              },
-                            ),
+                            child:
+                            CachedNetworkImage(
+                                imageUrl: ImageHelper.getProductImageUrl(products[index].image),
+                                // width: containerWidth,
+                                // height: containerHeight,
+                                fit: BoxFit.contain,
+                                errorWidget: (BuildContext context, String url, dynamic error) {
+                                  return Container(
+                                    color: Colors.white70,
+                                    child: Icon(
+                                      Icons.error,
+                                      color: Colors.red,
+                                    ),
+                                  );
+
+                                },
+                              cacheManager: DefaultCacheManager(),
+
+                            )
+
+                            // Image.network(
+                            //   ImageHelper.getProductImageUrl(products[index].image),
+                            //   // 'https://apip.trifrnd.com/fruits/${products[index].image}',
+                            //   errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                            //     return Container(
+                            //       color: Colors.white70,
+                            //       child: Icon(
+                            //         Icons.error,
+                            //         color: Colors.red,
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
                           ),
                           title: Text(products[index].title),
-                          subtitle: Text('Rs: \$${products[index].price.toStringAsFixed(2)}',
+                          subtitle: Text('Rs: ${products[index].price.toStringAsFixed(2)}',
                             style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.bold,

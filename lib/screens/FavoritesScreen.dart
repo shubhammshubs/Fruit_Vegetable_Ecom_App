@@ -2,6 +2,7 @@
 
 
 import 'package:flutter/material.dart';
+import '../APi/Product_class.dart';
 import '../Inside_Pages/Product.dart';
 
 class FavoritesScreen extends StatelessWidget {
@@ -36,23 +37,23 @@ class FavoritesScreen extends StatelessWidget {
               margin: EdgeInsets.all(8.0),
               child: ListTile(
                 leading: Image.asset(
-                  product.images[0],
+                  product.image[0],
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,
                 ),
-                title: Text(product.name),
-                subtitle: Text('Price: \Rs.${double.parse(product.price).toStringAsFixed(2)}'),
+                title: Text(product.title),
+                subtitle: Text('Price: \Rs.${double.parse(product.price as String).toStringAsFixed(2)}'),
                 // trailing: Text('Quantity: ${item.quantity}'),
               ),
             );
             ListTile(
             leading: Image.asset(
-              product.images[0],
+              product.image[0],
               width: 80,
               height: 80,
             ),
-            title: Text(product.name),
+            title: Text(product.title),
             subtitle: Text('Price: \$${product.price}'),
           );
         },
