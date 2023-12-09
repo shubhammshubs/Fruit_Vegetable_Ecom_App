@@ -16,37 +16,67 @@ import 'User_Credentials/login_Screen.dart';
 
 
 class HomePage extends StatefulWidget {
+  // final String mobileNumber;
+  //
+  //
+  // HomePage({
+  //   required this.mobileNumber
+  // });
 
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
+//
+// class _HomePageState extends State<HomePage> {
+//
+//
+//   double screenHeight = 0;
+//   double screenWidth = 0;
+//
+//   // Color primary = const Color(0xffeef444c);
+//   int _currentIndex = 0; // Index of the selected tab
+//
+//   final List<Widget> _pages = [
+//     HomeScreen(mobileNumber: widget.mobileNumber,),
+//     // MyCart(cart: cart,),
+//     // const OrdersScreen(),
+//     // AddToCartPagedraft(),
+//     AddToCartPage(),
+//     // LoginScreen(),
+//     FavoritesScreen(favoriteItems: favoriteItems,),
+//     const OrdersScreen(),
+//     const Profilescreen(),
+//   ];
 
 class _HomePageState extends State<HomePage> {
-
-
   double screenHeight = 0;
   double screenWidth = 0;
 
-  // Color primary = const Color(0xffeef444c);
   int _currentIndex = 0; // Index of the selected tab
 
-  final List<Widget> _pages = [
-    HomeScreen(),
-    // MyCart(cart: cart,),
-    // const OrdersScreen(),
-    MyCartPage(),
-    // LoginScreen(),
-    FavoritesScreen(favoriteItems: favoriteItems,),
-    const OrdersScreen(),
-    const Profilescreen(),
-  ];
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize _pages here where widget is accessible
+    _pages = [
+      HomeScreen(
+          // mobileNumber: widget.mobileNumber
+      ),
+      // AddToCartPage(mobileNumber: '',),
+      FavoritesScreen(favoriteItems: favoriteItems),
+      const OrdersScreen(),
+      const Profilescreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -56,10 +86,10 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'My Cart',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.shopping_cart),
+          //   label: 'My Cart',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorites',

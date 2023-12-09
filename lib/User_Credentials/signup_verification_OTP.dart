@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pinput/pinput.dart';
 
+import '../APi/Product_class.dart';
 import 'Signup_Screen.dart';
 import 'Signup_verification.dart';
 
@@ -10,8 +11,15 @@ import 'Signup_verification.dart';
 
 class SignupVerifyOTP extends StatefulWidget {
   final String mobileNumber;
+  final Product product;
+  // final String mobileNumber;
 
-  const SignupVerifyOTP({Key? key, required this.mobileNumber});
+
+  SignupVerifyOTP({required this.product,
+    required this.mobileNumber
+  });
+
+  // const SignupVerifyOTP({Key? key, required this.mobileNumber});
   @override
   State<SignupVerifyOTP> createState() => _SignupVerifyOTPState();
 }
@@ -110,6 +118,7 @@ class _SignupVerifyOTPState extends State<SignupVerifyOTP> {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) =>
                           SignUpScreen(mobileNumber: widget.mobileNumber,
+                            product: widget.product,
                           ),),
                     );
                     Fluttertoast.showToast(
@@ -162,7 +171,7 @@ class _SignupVerifyOTPState extends State<SignupVerifyOTP> {
                 children: [
                   TextButton(onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SignupMobileVerify(),),
+                      MaterialPageRoute(builder: (context) => SignupMobileVerify(product: widget.product,),),
                     );
                   },
                       child: const Text('Edit Phone Number ?',

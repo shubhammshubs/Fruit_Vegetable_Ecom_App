@@ -148,7 +148,7 @@ class _PopularItemsSliderState extends State<PopularItems1Slider> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                ProductDetailsPageFromAPI(product: product),
+                                ProductDetailsPageFromAPI(product: product, mobileNumber: '',),
                           ),
                         );
                       },

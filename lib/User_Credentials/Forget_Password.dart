@@ -79,11 +79,11 @@ class _ForgetPassState extends State<ForgetPass> {
           textColor: Colors.white,
         );
         // Use Navigator to push HomePage onto the stack
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) =>  LoginScreen(
-
-          ),),
-        );
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(builder: (context) =>  LoginScreen(
+        //
+        //   ),),
+        // );
 
       } else {
         // Login failed, show an error message
@@ -115,9 +115,9 @@ class _ForgetPassState extends State<ForgetPass> {
     return WillPopScope(
       onWillPop: () async {
         // Navigate to the SignInPage when the back button is pressed
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(builder: (context) => LoginScreen()),
+        // );
         // Return false to prevent the default back button behavior
         return false;
       },

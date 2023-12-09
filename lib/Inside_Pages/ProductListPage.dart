@@ -39,7 +39,7 @@ class _ProductListPageState extends State<ProductListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductDetailsPageFromAPI(product: product)
+        builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: '',)
       ),
     );
   }
@@ -77,7 +77,8 @@ class _ProductListPageState extends State<ProductListPage> {
                     return Column(
                       children: [
                         ListTile(
-                          leading: Container(
+                          leading:
+                          Container(
                             width: 50.0, // Set a suitable width for the image
                             height: 100.0, // Set a suitable height for the image
                             child:

@@ -321,6 +321,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import '../APi/Product_class.dart';
 import '../HomePage1.dart';
 import '../Screens/Home_screen.dart';
 import '../screens/my_cart.dart';
@@ -331,7 +332,17 @@ import 'login_Screen.dart';
 class SignUpScreen extends StatefulWidget {
   final String mobileNumber;
 
-  SignUpScreen({required this.mobileNumber});
+  final Product product;
+  // final String mobileNumber;
+
+
+  // SignupVerifyOTP({required this.product,
+  //   required this.mobileNumber
+  // });
+
+  SignUpScreen({required this.product ,
+    required this.mobileNumber
+  });
 
   @override
   State<SignUpScreen> createState() => _RegistrationPageState();
@@ -399,14 +410,14 @@ class _RegistrationPageState extends State<SignUpScreen> {
           textColor: Colors.white,
         );
         // Use Navigator to push HomePage onto the stack
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) =>
-              LoginScreen()
-          //     HomePage(
-          //   mobileNumber: _mobileController.text,
-          // ),
-          ),
-        );
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(builder: (context) =>
+        //       LoginScreen()
+        //   //     HomePage(
+        //   //   mobileNumber: _mobileController.text,
+        //   // ),
+        //   ),
+        // );
 
       } else {
         // Login failed, show an error message
@@ -420,8 +431,9 @@ class _RegistrationPageState extends State<SignUpScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MyCartPage(
-              // mobileNumber: _mobileController.text,
+            builder: (context) =>
+                AddToCartPage(
+              mobileNumber: _mobileController.text, product: widget.product,
             ),
           ),
         );
@@ -443,9 +455,9 @@ class _RegistrationPageState extends State<SignUpScreen> {
     return WillPopScope(
       onWillPop: () async {
         // Navigate to the SignInPage when the back button is pressed
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(builder: (context) => LoginScreen()),
+        // );
         // Return false to prevent the default back button behavior
         return false;
       },

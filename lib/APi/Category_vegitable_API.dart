@@ -36,13 +36,13 @@ Future<List<Product>> fetchDataFromApi(String productCategory) async {
   }
 }
 
-class ImageHelper {
-  static const String baseUrl = 'https://apip.trifrnd.com/fruits/';
+  class ImageHelper {
+    static const String baseUrl = 'https://apip.trifrnd.com/fruits/';
 
-  static String getProductImageUrl(String imagePath) {
-    return '$baseUrl$imagePath';
+    static String getProductImageUrl(String imagePath) {
+      return '$baseUrl$imagePath';
+    }
   }
-}
 
 
 

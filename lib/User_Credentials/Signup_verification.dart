@@ -3,12 +3,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../APi/Product_class.dart';
 import 'login_Screen.dart';
 
 
 
 class SignupMobileVerify extends StatefulWidget {
-  const SignupMobileVerify({super.key});
+  // const SignupMobileVerify({super.key});
+  final Product product;
+  // final String mobileNumber;
+  
+
+
+  SignupMobileVerify({required this.product,
+    // required this.mobileNumber
+  });
 
   static String verify="";
 
@@ -159,7 +168,7 @@ class _SignupMobileVerifyState extends State<SignupMobileVerify> {
                               // Navigator.pushNamed(context, "otp");
 
                               Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => SignupVerifyOTP(mobileNumber: _mobileController,),),
+                                MaterialPageRoute(builder: (context) => SignupVerifyOTP(mobileNumber: _mobileController, product: widget.product,),),
                               );
 
                             },
@@ -199,9 +208,9 @@ class _SignupMobileVerifyState extends State<SignupMobileVerify> {
 
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => LoginScreen(),),
-                  );
+                  // Navigator.of(context).push(
+                  //   MaterialPageRoute(builder: (context) => LoginScreen(),),
+                  // );
                 },
                 child: Text(
                   'Already Registered? Login Here',

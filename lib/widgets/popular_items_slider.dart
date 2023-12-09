@@ -332,7 +332,7 @@ class PopularItemsSlider extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailsPageFromAPI(product: product),
+                          builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: '',),
                         ),
                       );
                     },

@@ -11,6 +11,14 @@ import 'Category.dart';
 
 
 class HomeScreen extends StatelessWidget {
+  // final String mobileNumber;
+  //
+  // HomeScreen({required this.mobileNumber});
+
+  // final String mobileNumber;
+  //
+  // // Constructor with named parameter
+  // HomeScreen({Key? key, this.mobileNumber = ''}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +94,8 @@ class HomeScreen extends StatelessWidget {
             ),
 
             SizedBox(height: 25,),
+            // Text('Mobile: $mobileNumber'),
+
             // -----------------------------Image slider Code-------------------------------
 
             Container(

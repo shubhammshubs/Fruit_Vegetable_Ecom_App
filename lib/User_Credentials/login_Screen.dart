@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ecom/Screens/Home_screen.dart';
 import 'package:ecom/User_Credentials/Forgot_Password_OTP_Screen.dart';
 import 'package:ecom/User_Credentials/Signup_Screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,14 +8,23 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../APi/Product_class.dart';
 import '../HomePage1.dart';
+import '../Inside_Pages/Product_Details_Display_from_API.dart';
 import '../screens/my_cart.dart';
 import 'Forgot_Pass_Email_Verification.dart';
 import 'Signup_verification.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  // const LoginScreen({super.key});
+  final Product product;
+  // final String mobileNumber;
 
+
+  LoginScreen({required this.product,
+    // required this.mobileNumber
+  });
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -25,6 +35,17 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+
+
+  // Inside your LoginScreen class
+  void _navigateBackToProductDetailsPage(BuildContext context) {
+    // Replace these placeholder values with the actual user's mobile number and product
+    String userMobileNumber = _mobileController.text;
+    // Product userProduct = Product(/* Initialize your product */);
+
+    Navigator.pop(context, userMobileNumber);
+    // Navigator.pop(context, userProduct);
+  }
 
   Future<void> _login() async {
     setState(() {
@@ -60,20 +81,39 @@ class _LoginScreenState extends State<LoginScreen> {
         try {
           // final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
           // sharedPreferences.setString('mobile', _mobileController.text);
+          // Navigate back to the ProductDetailsPageFromAPI with the user's mobile number and product
+          // _navigateBackToProductDetailsPage(context);
+          final SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+
+          // Save the mobile number and other credentials if needed
+          sharedPreferences.setString('mobile', _mobileController.text);
+          // sharedPreferences.setString('password', _passwordController.text);
+
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailsPageFromAPI(product: widget.product, mobileNumber: _mobileController.text,)));
+
         } catch (e) {
           // Handle the exception, e.g., print an error message.
           print('Error: $e');
         }
+        // Inside your LoginScreen class
+        // void _navigateBackToProductDetailsPage(BuildContext context) {
+        //   // Assume you have the user's mobile number and product
+        //   String userMobileNumber = '1234567890'; // Replace with actual mobile number
+        //   Product userProduct = Product(/* Initialize your product */); // Replace with actual product
+        //
+        //   Navigator.pop(context, userMobileNumber);
+        //   Navigator.pop(context, userProduct);
+        // }
 
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyCartPage(
-              mobileNumber: _mobileController.text,
-            ),
-          ),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => HomeScreen(
+        //       // mobileNumber: _mobileController.text,
+        //     ),
+        //   ),
+        // );
       } else {
         // Login failed, show an error message
         print("Login failed");
@@ -117,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 180,
                 ),
                 const SizedBox(height: 10,),
-            
+
                 Text( "Sign In",
                 style: TextStyle(color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -131,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 30,),
-            
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TextFormField(
@@ -247,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 SizedBox(height: 30,),
-            
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 35),
                   child: MaterialButton(
@@ -259,10 +299,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() {
                           _isLoading = true;
                         });
-            
+
                         // Perform the login
                         await _login();
-            
+
                         // Hide loading indicator after login completes
                         setState(() {
                           _isLoading = false;
@@ -303,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 //     ),
                 //   ),
                 // ),
-            
+
                 // SizedBox(height: 40,),
                 // const Padding(
                 //   padding: EdgeInsets.symmetric(horizontal: 35),
@@ -405,7 +445,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.push(context,
                     MaterialPageRoute(builder: (context) =>
                     // SignUpScreen()
-                    SignupMobileVerify()
+                    SignupMobileVerify(product: widget.product,)
                     ));
                   },
                   child: Text(
@@ -416,8 +456,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-            
-            
+
+
               ],
             ),
           ),
