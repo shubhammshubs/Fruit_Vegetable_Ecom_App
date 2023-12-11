@@ -65,8 +65,12 @@ import 'dart:async';
 class PopularItems1Slider extends StatefulWidget {
   final String productCategory;
 
+  final String mobileNumber;
+
+  // HomeScreen({required this.mobileNumber});
   PopularItems1Slider({
     required this.productCategory,
+    required this.mobileNumber,
   });
 
   @override
@@ -148,7 +152,7 @@ class _PopularItemsSliderState extends State<PopularItems1Slider> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                ProductDetailsPageFromAPI(product: product, mobileNumber: '',),
+                                ProductDetailsPageFromAPI(product: product, mobileNumber: widget.mobileNumber,),
                           ),
                         );
                       },

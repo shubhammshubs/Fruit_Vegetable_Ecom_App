@@ -10,18 +10,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Inside_Pages/product_details_pg_1.dart';
 import 'User_Credentials/login_Screen.dart';
 
 
 class HomePage extends StatefulWidget {
-  // final String mobileNumber;
-  //
-  //
-  // HomePage({
-  //   required this.mobileNumber
-  // });
+  final String mobileNumber;
+
+
+  HomePage({
+    required this.mobileNumber
+  });
+
 
 
   @override
@@ -53,6 +55,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   double screenHeight = 0;
   double screenWidth = 0;
+  late String mobileNumber;
 
   int _currentIndex = 0; // Index of the selected tab
 
@@ -62,17 +65,20 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+
     // Initialize _pages here where widget is accessible
     _pages = [
       HomeScreen(
-          // mobileNumber: widget.mobileNumber
+          mobileNumber: widget.mobileNumber
       ),
-      // AddToCartPage(mobileNumber: '',),
+      AddToCartPage(mobileNumber: widget.mobileNumber,),
       FavoritesScreen(favoriteItems: favoriteItems),
       const OrdersScreen(),
-      const Profilescreen(),
+      Profilescreen(mobileNumber: widget.mobileNumber,),
     ];
+
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,16 +86,16 @@ class _HomePageState extends State<HomePage> {
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed, // Use this to display all icons 
+        type: BottomNavigationBarType.fixed, // Use this to display all icons
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.shopping_cart),
-          //   label: 'My Cart',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'My Cart',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorites',

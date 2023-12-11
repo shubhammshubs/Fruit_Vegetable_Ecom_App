@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 // import '../Classes/CartItem_Class.dart';
 import '../APi/Product_class.dart';
+import '../HomePage1.dart';
 import '../screens/FavoritesScreen.dart';
 import '../screens/my_cart.dart';
 import '../widgets/popular_items_slider.dart';
@@ -17,10 +18,13 @@ List<Product> favoriteItems = [];
 
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
+  final String mobileNumber;
 
 
   // Constructor to receive the product object
-  ProductDetailsPage({required this.product});
+  ProductDetailsPage({
+    required this.product,
+    required this.mobileNumber});
 
 
 
@@ -93,12 +97,26 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           centerTitle: true,
       backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          onPressed: (){
-            Navigator.pop(context);
-          },
-          icon:   const Icon(Icons.arrow_back,color: Colors.black,),
-        ),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, widget.mobileNumber);
+            },
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+          ),
+
+        //
+        // leading: IconButton(
+        //     onPressed: () {
+        //       Navigator.of(context).pushReplacement(
+        //         MaterialPageRoute(
+        //           builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
+        //         ),
+        //       );
+        //     },
+        //     icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   ),
+
+
         actions: <Widget>[
 // In your build method, use a ternary operator to display the appropriate icon based on the state
           IconButton(
@@ -265,7 +283,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 SizedBox(height: 6,),
                 Container(
                   height: 250.0, // Set a suitable height
-                  child: PopularItemsSlider(),
+                  child: PopularItemsSlider(mobileNumber: widget.mobileNumber,),
                 ),
               ],
             ),

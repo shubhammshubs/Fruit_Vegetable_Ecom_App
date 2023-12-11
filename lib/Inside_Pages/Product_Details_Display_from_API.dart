@@ -6,16 +6,17 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart' as http;
 import '../APi/Category_vegitable_API.dart';
 import '../APi/Product_class.dart';
+import '../HomePage1.dart';
 import '../User_Credentials/login_Screen.dart';
 import '../widgets/popular_items_slider.dart';
 
 class ProductDetailsPageFromAPI extends StatefulWidget {
-  final Product product;
+  final Product? product; // Change the type to Product?
   final String mobileNumber;
 
 
-  ProductDetailsPageFromAPI({required this.product,
-    required this.mobileNumber
+  ProductDetailsPageFromAPI({ this.product,
+     required this.mobileNumber
   });
 
   @override
@@ -31,12 +32,12 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
   void initState() {
     super.initState();
     // Set initial total price to the product's price
-    totalPrice = widget.product.price;
+    totalPrice = widget.product!.price;
   }
 
   void updateTotalPrice() {
     // Calculate total price based on selected quantity
-    totalPrice = selectedQuantity * widget.product.price;
+    totalPrice = selectedQuantity * widget.product!.price;
   }
   void incrementQuantity() {
     setState(() {
@@ -83,12 +84,12 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
 
     // Replace 'your_mobile_number' and 'your_product_id' with actual values
     final mobileNumber = widget.mobileNumber;
-    final productId = widget.product.id.toString(); // Assuming product id is an int
+    final productId = widget.product!.id.toString(); // Assuming product id is an int
 
     final quantity = selectedQuantity.toString();
     final price = totalPrice.toString(); // Use the updated total price
-    final title = widget.product.title.toString();
-    final image = widget.product.image.toString();
+    final title = widget.product!.title.toString();
+    final image = widget.product!.image.toString();
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -104,9 +105,6 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
       },
     );
     if (mobileNumber != null && mobileNumber.isNotEmpty) {
-      // final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=addtocart';
-
-      // ... (rest of the function remains unchanged)
 
       if (response.statusCode == 200) {
         // Successful request, handle the response as needed
@@ -123,7 +121,9 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
       }
     } else {
       // User has not provided the mobile number, navigate to LoginScreen
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(product: widget.product,)));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(
+        // product: widget.product,
+      )));
     }
 
     // if (response.statusCode == 200) {
@@ -151,11 +151,15 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
 
 
     return WillPopScope(
-        onWillPop: () async {
-      // Handle the back button press
-      Navigator.popUntil(context, (route) => route.isFirst);
-      return true;
-    },
+      onWillPop: () async {
+        // Handle the back button press
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
+          ),
+        );
+        return true; // Return true to allow the back button press
+      },
     child: Scaffold(
 
       // extendBodyBehindAppBar: true,
@@ -165,42 +169,45 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading:
 
-        IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back, color: Colors.black,),
-        ),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.arrow_back, color: Colors.green),
+            ),
         actions: <Widget>[
-          IconButton(onPressed: (){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>
-                    AddToCartPage(
-                      mobileNumber: widget.mobileNumber,
-                      product: widget.product,)));
-          },
-              // Icon(Icons.shopping_cart)
-              icon: Icon(Icons.shopping_cart  ))
+          // IconButton(onPressed: (){
+          //   Navigator.push(context,
+          //       MaterialPageRoute(builder: (context) =>
+          //           AddToCartPage(
+          //             mobileNumber: widget.mobileNumber,
+          //             product: widget.product,)));
+          // },
+          //     // Icon(Icons.shopping_cart)
+          //     icon: Icon(Icons.shopping_cart  ))
 // In your build method, use a ternary operator to display the appropriate icon based on the state
-//           IconButton(
-//             onPressed: () {
-//               setState(() {
-//                 // favoriteItems.add(widget.product);
-//                 final snackBar = SnackBar(
-//                     content: Text('Item has been added to the Favorites'));
-//                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
-//
-//                 // Navigator.pop(context);
-//
-//               //
-//                 isSavedForLater =
-//                 !isSavedForLater; // Toggle the saved for later state
-//               });
-//             },
-//             icon: isSavedForLater ? _filledHeartIcon : _emptyHeartIcon,
-//           )
+          IconButton(
+            onPressed: () {
+              setState(() {
+                // favoriteItems.add(widget.product);
+                final snackBar = SnackBar(
+                    content: Text('Item has been added to the Favorites'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                // Navigator.pop(context);
+
+              //
+                isSavedForLater =
+                !isSavedForLater; // Toggle the saved for later state
+              });
+            },
+            icon: isSavedForLater ? _filledHeartIcon : _emptyHeartIcon,
+          )
         ],
       ),
       key: GlobalKey<ScaffoldState>(), // Add a GlobalKey for the Scaffold
@@ -221,7 +228,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
               // Text('image: ${widget.product.image}'),
               // Image.network('https://apip.trifrnd.com/fruits/${widget.product.image}'),
               CachedNetworkImage(
-                imageUrl: ImageHelper.getProductImageUrl(widget.product.image),
+                imageUrl: ImageHelper.getProductImageUrl(widget.product!.image),
                 width: screenWidth, // Set a suitable width
                 height: 200.0, // Set a suitable height
                 placeholder: (BuildContext context, String url) {
@@ -271,7 +278,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    'Title: ${widget.product.title}', // Display the product name
+                    'Title: ${widget.product!.title}', // Display the product name
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -292,7 +299,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
                     // Place Rs and Quantity at both corners
                     children: [
                       Text(
-                        'Rs.: ${widget.product.price}',
+                        'Rs.: ${widget.product!.price}',
                         // Display the product price
                         style: TextStyle(
                           fontSize: 16.0,
@@ -349,7 +356,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Product Id: ${widget.product.id}', // Header for product description
+                'Product Id: ${widget.product!.id}', // Header for product description
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
@@ -361,7 +368,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                  'description: ${widget.product.description}', // Header for product description
+                  'description: ${widget.product!.description}', // Header for product description
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
@@ -371,7 +378,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ExpandableText(
-                widget.product.description, // Display the product description
+                widget.product!.description, // Display the product description
                 style: TextStyle(fontSize: 14.0),
                 expandText: 'Read More',
                 collapseText: 'Read Less',
@@ -400,7 +407,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
                 SizedBox(height: 6,),
                 Container(
                   height: 250.0, // Set a suitable height
-                  child: PopularItemsSlider(),
+                  child: PopularItemsSlider(mobileNumber: widget.mobileNumber,),
                 ),
               ],
             ),

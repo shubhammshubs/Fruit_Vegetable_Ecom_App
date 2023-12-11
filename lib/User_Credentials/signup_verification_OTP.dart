@@ -11,11 +11,12 @@ import 'Signup_verification.dart';
 
 class SignupVerifyOTP extends StatefulWidget {
   final String mobileNumber;
-  final Product product;
+  // final Product? product;
   // final String mobileNumber;
 
 
-  SignupVerifyOTP({required this.product,
+  SignupVerifyOTP({
+    // this.product,
     required this.mobileNumber
   });
 
@@ -118,7 +119,7 @@ class _SignupVerifyOTPState extends State<SignupVerifyOTP> {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) =>
                           SignUpScreen(mobileNumber: widget.mobileNumber,
-                            product: widget.product,
+                            // product: widget.product,
                           ),),
                     );
                     Fluttertoast.showToast(
@@ -171,7 +172,7 @@ class _SignupVerifyOTPState extends State<SignupVerifyOTP> {
                 children: [
                   TextButton(onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SignupMobileVerify(product: widget.product,),),
+                      MaterialPageRoute(builder: (context) => SignupMobileVerify(),),
                     );
                   },
                       child: const Text('Edit Phone Number ?',

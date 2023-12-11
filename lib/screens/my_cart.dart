@@ -340,10 +340,10 @@ import 'Check_Out_Screen/Delivery_Address.dart';
 
 class AddToCartPage extends StatefulWidget {
   final String mobileNumber;
-  final Product product;
+  final Product? product; // Make the product parameter nullable
   AddToCartPage({
     required this.mobileNumber,
-    required this.product
+    this.product
   });
   @override
   _AddToCartPageState createState() => _AddToCartPageState();
@@ -641,7 +641,8 @@ class _AddToCartPageState extends State<AddToCartPage> {
                 // For example, you can navigate to a checkout page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen(product: widget.product)),
+                  MaterialPageRoute(builder: (context) => LoginScreen(
+                      )),
                 );
               },
               child: Text('Sign In to continue'),

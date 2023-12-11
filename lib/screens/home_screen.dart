@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Inside_Pages/Notification_page.dart';
 import '../widgets/best_deals_slider.dart';
@@ -11,14 +12,28 @@ import 'Category.dart';
 
 
 class HomeScreen extends StatelessWidget {
-  // final String mobileNumber;
-  //
-  // HomeScreen({required this.mobileNumber});
+  final String mobileNumber;
+
+  HomeScreen({required this.mobileNumber});
 
   // final String mobileNumber;
   //
   // // Constructor with named parameter
   // HomeScreen({Key? key, this.mobileNumber = ''}) : super(key: key);
+  Future<void> logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Clear the stored data
+    prefs.remove('isLoggedIn');
+    prefs.remove('mobileNumber');
+
+    // Navigate to the login screen
+    // Navigator.of(context).pushReplacement(
+    //   MaterialPageRoute(
+    //     builder: (context) => HomeScreen(mobileNumber: ''),
+    //   ),
+    // );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +63,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 26,),
+                Text("mobile:  ${mobileNumber}"),
                 Text('Location',
                   style: TextStyle(color: Colors.black54,
                     fontFamily: "NexaRegular",
@@ -100,7 +116,7 @@ class HomeScreen extends StatelessWidget {
 
             Container(
                 child:
-                PopularItems1Slider(productCategory: 'Vegetable',),
+                PopularItems1Slider(productCategory: 'Vegetable', mobileNumber: mobileNumber,),
                 // ImageSlider(),
             ),
             // -----------------------------Image slider Category Section Code-------------------------------
@@ -124,7 +140,7 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => CategoryPage(), // Use your CategoryPage widget
+                            builder: (context) => CategoryPage(mobileNumber: mobileNumber,), // Use your CategoryPage widget
                           ),
                         );
                       },
@@ -147,13 +163,13 @@ class HomeScreen extends StatelessWidget {
                     Container(
                       height: 120.0,
                       child: CategoryItem(category:
-                      categories[0]), // Display the first category
+                      categories[0], mobileNumber: mobileNumber,), // Display the first category
                     ),
                     // SizedBox(width: 4,),
                     Container(
                       height: 120.0,
                       child: CategoryItem(category:
-                      categories[1]), // Display the first category
+                      categories[1], mobileNumber: mobileNumber,), // Display the first category
                     ),
                     // SizedBox(width: 14,),
                     // Container(
@@ -194,7 +210,7 @@ class HomeScreen extends StatelessWidget {
                   height: 250.0, // Set a suitable height
                   child:
                   // BestDealsSlider(productCategory: 'Vegetable',),
-                  BestDealsSlider(),
+                  BestDealsSlider(mobileNumber: mobileNumber,),
                 ),
               ],
             ),
@@ -210,7 +226,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 6,),
                 Container(
                   height: 250.0, // Set a suitable height
-                  child: PopularItemsSlider(),
+                  child: PopularItemsSlider(mobileNumber: mobileNumber,),
                 ),
               ],
             ),

@@ -14,9 +14,11 @@ import 'Product_Details_Display_from_API.dart';
 
 class ProductListPage extends StatefulWidget {
   final String productCategory;
+  final String mobileNumber;
 
   ProductListPage({
     required this.productCategory,
+    required this.mobileNumber,
 
     });
 
@@ -39,7 +41,7 @@ class _ProductListPageState extends State<ProductListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: '',)
+        builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: widget.mobileNumber,)
       ),
     );
   }

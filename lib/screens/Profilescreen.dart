@@ -1,14 +1,57 @@
+import 'package:ecom/HomePage1.dart';
+import 'package:ecom/Screens/Home_screen.dart';
+import 'package:ecom/User_Credentials/login_Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// class Profilescreen extends StatelessWidget {
+//   final String mobileNumber;
+//    Profilescreen({super.key,
+//     required this.mobileNumber});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title:  Text(
+//           'Profile',
+//           style: TextStyle(color: Colors.black),
+//         ),
+//         centerTitle: true,
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         leading: IconButton(
+//           onPressed: () {
+//             Navigator.pop(context);
+//           },
+//           icon: const Icon(Icons.arrow_back, color: Colors.black),
+//         ),
+//       ),
+//       body: LayoutBuilder(
+//         builder: (context, constraints) {
+//           if (constraints.maxWidth > 600) {
+//             // Use a two-column layout for larger screens
+//             return TwoColumnLayout(mobileNumber: mobileNumber,);
+//           } else {
+//             // Use a single-column layout for smaller screens
+//             return SingleColumnLayout(mobileNumber: mobileNumber,);
+//           }
+//         },
+//       ),
+//     );
+//   }
+// }
 
 class Profilescreen extends StatelessWidget {
-  const Profilescreen({super.key});
+  final String? mobileNumber; // Make mobileNumber nullable
+  Profilescreen({super.key, required this.mobileNumber});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Profile',
           style: TextStyle(color: Colors.black),
         ),
@@ -24,12 +67,32 @@ class Profilescreen extends StatelessWidget {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          if (constraints.maxWidth > 600) {
-            // Use a two-column layout for larger screens
-            return TwoColumnLayout();
+          if (mobileNumber != null && mobileNumber!.isNotEmpty) {
+            // User is logged in, show the profile
+            if (constraints.maxWidth > 600) {
+              return TwoColumnLayout(mobileNumber: mobileNumber!);
+            } else {
+              return SingleColumnLayout(mobileNumber: mobileNumber!);
+            }
           } else {
-            // Use a single-column layout for smaller screens
-            return SingleColumnLayout();
+            // User is not logged in, show "Sign In to continue" button
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Sign In to continue'),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: Text('Sign In'),
+                  ),
+                ],
+              ),
+            );
           }
         },
       ),
@@ -38,6 +101,10 @@ class Profilescreen extends StatelessWidget {
 }
 
 class TwoColumnLayout extends StatelessWidget {
+  final String mobileNumber;
+  TwoColumnLayout({
+    required this.mobileNumber});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -74,26 +141,41 @@ class TwoColumnLayout extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Shubham Mahajan',
+                Text(
+                  'Mobile ${mobileNumber}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                Text(
+                  'Shubham Mahajan Mobile ${mobileNumber}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
               ],
             ),
           ),
         ),
         Expanded(
           flex: 1,
-          child: ProfileActions(),
+          child: ProfileActions(mobileNumber: '${mobileNumber}',),
         ),
       ],
     );
   }
 }
+
 class SingleColumnLayout extends StatelessWidget {
+  final String mobileNumber;
+
+  SingleColumnLayout({
+    required this.mobileNumber,
+  });
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -103,7 +185,7 @@ class SingleColumnLayout extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Stack(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 60,
                   backgroundImage: AssetImage('assets/images/1.png'),
                   backgroundColor: Colors.white,
@@ -132,14 +214,22 @@ class SingleColumnLayout extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Shubham Mahajan',
+          Text(
+            'Shubham Mahajan ',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
-          ProfileActions(),
+          Text(
+            'mobile : ${mobileNumber}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          // Move the ProfileActions widget inside the SingleChildScrollView
+          ProfileActions(mobileNumber: '${mobileNumber}'),
         ],
       ),
     );
@@ -148,9 +238,26 @@ class SingleColumnLayout extends StatelessWidget {
 
 
 class ProfileActions extends StatelessWidget {
+  final String mobileNumber;
+  ProfileActions({
+    required this.mobileNumber});
+
+  Future<void> _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all stored data, you might want to clear specific keys
+
+    // Navigate to the login screen
+    final snackBar = SnackBar(content: Text('Successfully Logout'));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => HomePage(mobileNumber: ''),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
-    return  const SingleChildScrollView(
+    return  SingleChildScrollView(
       child: Column(
         children: [
         Divider(
@@ -196,9 +303,10 @@ class ProfileActions extends StatelessWidget {
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
           ),
           ListTile(
-            leading: Icon(Icons.logout,color: Colors.green,),
+            leading: Icon(Icons.logout, color: Colors.green),
             title: Text('Log out'),
-            trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
+            trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
+            onTap: () => _logout(context), // Trigger the logout function
           ),
           ListTile(
             leading: Icon(Icons.share,color: Colors.green,),

@@ -18,13 +18,14 @@ import 'Signup_verification.dart';
 
 class LoginScreen extends StatefulWidget {
   // const LoginScreen({super.key});
-  final Product product;
+  // final Product? product; // Change the type to Product?
   // final String mobileNumber;
 
 
-  LoginScreen({required this.product,
-    // required this.mobileNumber
-  });
+  // LoginScreen({
+  //   // this.product,
+  //   // required this.mobileNumber
+  // });
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -47,13 +48,13 @@ class _LoginScreenState extends State<LoginScreen> {
     // Navigator.pop(context, userProduct);
   }
 
+
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
     });
 
-    final String apiUrl =
-        'https://apip.trifrnd.com/fruits/vegfrt.php?apicall=login';
+    final String apiUrl = 'https://apip.trifrnd.com/fruits/vegfrt.php?apicall=login';
 
     // Simulate a delay of 1 second
     await Future.delayed(Duration(seconds: 1));
@@ -74,47 +75,44 @@ class _LoginScreenState extends State<LoginScreen> {
 
       print("Decoded data: $responseData");
 
+// Inside _login method
       if (responseData == "OK") {
         // Login successful, you can navigate to the next screen
         print("Login successful");
         final user = json.decode(response.body)[0];
         try {
-          // final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-          // sharedPreferences.setString('mobile', _mobileController.text);
-          // Navigate back to the ProductDetailsPageFromAPI with the user's mobile number and product
-          // _navigateBackToProductDetailsPage(context);
-          final SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
+          final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-          // Save the mobile number and other credentials if needed
+          // Save the mobile number and login status
           sharedPreferences.setString('mobile', _mobileController.text);
-          // sharedPreferences.setString('password', _passwordController.text);
+          sharedPreferences.setBool('isLoggedIn', true);
 
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailsPageFromAPI(product: widget.product, mobileNumber: _mobileController.text,)));
-
+          // Also save other relevant user information if needed
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                // product: widget.product,
+                mobileNumber: _mobileController.text,
+              ),
+            ),
+          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => ProductDetailsPageFromAPI(
+          //       product: widget.product,
+          //       mobileNumber: _mobileController.text,
+          //     ),
+          //   ),
+          // );
         } catch (e) {
           // Handle the exception, e.g., print an error message.
           print('Error: $e');
         }
-        // Inside your LoginScreen class
-        // void _navigateBackToProductDetailsPage(BuildContext context) {
-        //   // Assume you have the user's mobile number and product
-        //   String userMobileNumber = '1234567890'; // Replace with actual mobile number
-        //   Product userProduct = Product(/* Initialize your product */); // Replace with actual product
-        //
-        //   Navigator.pop(context, userMobileNumber);
-        //   Navigator.pop(context, userProduct);
-        // }
+      }
 
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => HomeScreen(
-        //       // mobileNumber: _mobileController.text,
-        //     ),
-        //   ),
-        // );
-      } else {
+      else {
         // Login failed, show an error message
         print("Login failed");
         Fluttertoast.showToast(
@@ -128,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Handle error if the API call was not successful
       print("API call failed");
       Fluttertoast.showToast(
-        msg: "Server Connction Error!",
+        msg: "Server Connection Error!",
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.red,
         textColor: Colors.white,
@@ -445,7 +443,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.push(context,
                     MaterialPageRoute(builder: (context) =>
                     // SignUpScreen()
-                    SignupMobileVerify(product: widget.product,)
+                    SignupMobileVerify(
+                      // product: widget.product,
+                    )
                     ));
                   },
                   child: Text(

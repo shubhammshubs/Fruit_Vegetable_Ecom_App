@@ -10,14 +10,14 @@ import 'login_Screen.dart';
 
 class SignupMobileVerify extends StatefulWidget {
   // const SignupMobileVerify({super.key});
-  final Product product;
+  // final Product? product; // Change the type to Product?
   // final String mobileNumber;
   
 
 
-  SignupMobileVerify({required this.product,
-    // required this.mobileNumber
-  });
+  // SignupMobileVerify({ this.product,
+  //   // required this.mobileNumber
+  // });
 
   static String verify="";
 
@@ -168,7 +168,7 @@ class _SignupMobileVerifyState extends State<SignupMobileVerify> {
                               // Navigator.pushNamed(context, "otp");
 
                               Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => SignupVerifyOTP(mobileNumber: _mobileController, product: widget.product,),),
+                                MaterialPageRoute(builder: (context) => SignupVerifyOTP(mobileNumber: _mobileController, ),),
                               );
 
                             },

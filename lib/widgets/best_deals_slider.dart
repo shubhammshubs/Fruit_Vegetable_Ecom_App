@@ -307,6 +307,9 @@ import '../APi/Product_class.dart';
 import '../Inside_Pages/Product_Details_Display_from_API.dart';
 
 class BestDealsSlider extends StatelessWidget {
+  final String mobileNumber;
+
+  const BestDealsSlider({super.key, required this.mobileNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -330,7 +333,7 @@ class BestDealsSlider extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: '',),
+                          builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: mobileNumber,),
                         ),
                       );
                     },

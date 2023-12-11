@@ -332,7 +332,7 @@ import 'login_Screen.dart';
 class SignUpScreen extends StatefulWidget {
   final String mobileNumber;
 
-  final Product product;
+  // final Product? product;
   // final String mobileNumber;
 
 
@@ -340,7 +340,8 @@ class SignUpScreen extends StatefulWidget {
   //   required this.mobileNumber
   // });
 
-  SignUpScreen({required this.product ,
+  SignUpScreen({
+    // this.product ,
     required this.mobileNumber
   });
 
@@ -410,14 +411,14 @@ class _RegistrationPageState extends State<SignUpScreen> {
           textColor: Colors.white,
         );
         // Use Navigator to push HomePage onto the stack
-        // Navigator.of(context).push(
-        //   MaterialPageRoute(builder: (context) =>
-        //       LoginScreen()
-        //   //     HomePage(
-        //   //   mobileNumber: _mobileController.text,
-        //   // ),
-        //   ),
-        // );
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) =>
+              LoginScreen()
+          //     HomePage(
+          //   mobileNumber: _mobileController.text,
+          // ),
+          ),
+        );
 
       } else {
         // Login failed, show an error message
@@ -432,9 +433,11 @@ class _RegistrationPageState extends State<SignUpScreen> {
           context,
           MaterialPageRoute(
             builder: (context) =>
-                AddToCartPage(
-              mobileNumber: _mobileController.text, product: widget.product,
-            ),
+                LoginScreen()
+            //     HomePage(
+            //   mobileNumber: _mobileController.text,
+            //       // product: widget.product,
+            // ),
           ),
         );
       }

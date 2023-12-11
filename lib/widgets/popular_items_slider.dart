@@ -309,6 +309,9 @@ import '../APi/Product_class.dart';
 import '../Inside_Pages/Product_Details_Display_from_API.dart';
 
 class PopularItemsSlider extends StatelessWidget {
+  final String mobileNumber;
+
+  const PopularItemsSlider({super.key, required this.mobileNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +335,7 @@ class PopularItemsSlider extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: '',),
+                          builder: (context) => ProductDetailsPageFromAPI(product: product, mobileNumber: mobileNumber,),
                         ),
                       );
                     },

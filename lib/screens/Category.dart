@@ -5,6 +5,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Inside_Pages/ProductListPage.dart';
 
 class CategoryPage extends StatelessWidget {
+  final String mobileNumber;
+
+  CategoryPage({required this.mobileNumber});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +40,7 @@ class CategoryPage extends StatelessWidget {
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 return CategoryItem(
-                  category: categories[index],
+                  category: categories[index], mobileNumber: mobileNumber,
                 );
               },
             ),
@@ -61,20 +64,22 @@ class Category {
 
 class CategoryItem extends StatelessWidget {
   final Category category;
+  final String mobileNumber;
 
-  CategoryItem({required this.category});
+
+  CategoryItem({
+    required this.category,
+    required this.mobileNumber});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductListPage(productCategory: category.name),
+            builder: (context) => ProductListPage(productCategory: category.name, mobileNumber: mobileNumber,),
           ),
-
         );
       },
       child: Column(
