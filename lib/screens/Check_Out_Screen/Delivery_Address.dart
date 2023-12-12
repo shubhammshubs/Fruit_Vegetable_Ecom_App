@@ -100,9 +100,9 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
               content: Text('Saved Address',textAlign: TextAlign.center,),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context)=>
-                    PaymentMethodsPage()));
+            // Navigator.push(context, MaterialPageRoute(
+            //     builder: (context)=>
+            //         PaymentMethodsPage(mobileNumber: '',)));
             // Navigator.pop(context);
           },
           style: ElevatedButton.styleFrom(

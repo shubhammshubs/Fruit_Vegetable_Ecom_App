@@ -79,11 +79,11 @@ class _ForgetPassState extends State<ForgetPass> {
           textColor: Colors.white,
         );
         // Use Navigator to push HomePage onto the stack
-        // Navigator.of(context).push(
-        //   MaterialPageRoute(builder: (context) =>  LoginScreen(
-        //
-        //   ),),
-        // );
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) =>  LoginScreen(
+
+          ),),
+        );
 
       } else {
         // Login failed, show an error message

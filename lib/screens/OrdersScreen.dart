@@ -117,10 +117,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ActiveOrdersPage(mobileNumber: widget.mobileNumber,), // Create an instance of ActiveOrdersPage
 
             // Add your content for "Completed" tab here
-            CompletedOrdersPage(),
+            CompletedOrdersPage(
+              mobileNumber: widget.mobileNumber,
+            ),
 
             // Add your content for "Cancelled" tab here
-            CancleOrdersPage(),
+            CancleOrdersPage(
+              mobileNumber: widget.mobileNumber,
+            ),
           ],
         ),
       ),
