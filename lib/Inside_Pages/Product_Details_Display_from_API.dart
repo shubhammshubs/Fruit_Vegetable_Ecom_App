@@ -81,7 +81,6 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
 
     // Replace 'your_api_key_here' with the actual API key
     // final apiKey = 'your_api_key_here';
-
     // Replace 'your_mobile_number' and 'your_product_id' with actual values
     final mobileNumber = widget.mobileNumber;
     final productId = widget.product!.id.toString(); // Assuming product id is an int

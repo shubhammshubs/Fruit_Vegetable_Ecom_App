@@ -1,4 +1,7 @@
+import 'package:ecom/HomePage1.dart';
 import 'package:flutter/material.dart';
+
+import '../my_cart.dart';
 
 class OrderReview extends StatelessWidget {
   @override
@@ -155,7 +158,7 @@ class OrderReview extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {
               // Button logic
-              // Navigator.push(context, MaterialPageRoute(builder: (context)=>OrderReview()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage(mobileNumber: '',)));
               final snackBar = SnackBar(
                 content: Text('  Order is Successful ', textAlign: TextAlign.center),
               );

@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
       ),
       AddToCartPage(mobileNumber: widget.mobileNumber,),
       FavoritesScreen(favoriteItems: favoriteItems),
-      const OrdersScreen(),
+      OrdersScreen(mobileNumber: widget.mobileNumber,),
       Profilescreen(mobileNumber: widget.mobileNumber,),
     ];
 

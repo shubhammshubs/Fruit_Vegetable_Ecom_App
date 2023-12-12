@@ -1,12 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'OrderScreen_Navigators/Active_Orders.dart';
 import 'OrderScreen_Navigators/Cancle_Orders.dart';
 import 'OrderScreen_Navigators/Completed_Orders.dart';
 
 class OrdersScreen extends StatefulWidget {
-  const OrdersScreen({Key? key}) : super(key: key);
+  final String mobileNumber;
+  const OrdersScreen({Key? key, required this.mobileNumber}) : super(key: key);
 
   @override
   _OrdersScreenState createState() => _OrdersScreenState();
@@ -40,6 +44,38 @@ class _OrdersScreenState extends State<OrdersScreen> {
     ),
   ];
 
+  void fetchCartItems() async {
+    // ... (your existing code)
+
+    if (widget.mobileNumber == null || widget.mobileNumber.isEmpty) {
+      // ... (your existing code for showing the login dialog)
+      return;
+    }
+
+    // Continue with the API call
+    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readorder';
+
+    final mobileNumber = widget.mobileNumber;
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {'mobile': mobileNumber},
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the response body
+      final List<dynamic> data = json.decode(response.body);
+
+      // Update the state with the cart items
+      // setState(() {
+      //   cartItems = List<Map<String, dynamic>>.from(data);
+      // });
+    } else {
+      // Handle the error
+      print('Failed to fetch cart items. Error: ${response.body}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +114,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         body: TabBarView(
           children: [
             // Add your content for "Active" tab here
-            ActiveOrdersPage(), // Create an instance of ActiveOrdersPage
+            ActiveOrdersPage(mobileNumber: widget.mobileNumber,), // Create an instance of ActiveOrdersPage
 
             // Add your content for "Completed" tab here
             CompletedOrdersPage(),
