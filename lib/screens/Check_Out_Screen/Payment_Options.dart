@@ -266,11 +266,12 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
               );
 
               final snackBar = SnackBar(
-                content: Text('Payment done with $selectedOption ', textAlign: TextAlign.center),
+                content: Text('$selectedOption is Selected for Payment', textAlign: TextAlign.center),
               );
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             }
           },
+
 
           style: ElevatedButton.styleFrom(
             primary: Colors.green,

@@ -1,95 +1,177 @@
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class ActiveOrdersPage extends StatelessWidget {
+class ActiveOrdersPage extends StatefulWidget {
+  final String mobileNumber;
+
+  ActiveOrdersPage({Key? key, required this.mobileNumber}) : super(key: key);
+
+  @override
+  _ActiveOrdersPageState createState() => _ActiveOrdersPageState();
+}
+
+class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
+  late GlobalKey<RefreshIndicatorState> _refreshIndicatorKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  }
+
+  Future<void> _refresh() async {
+    // Trigger the refresh
+    _refreshIndicatorKey.currentState?.show();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth > 600) {
-            // For larger screens, display two entries in a row
-            return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // 2 entries in a row
-                childAspectRatio: 1.7, // Adjust the aspect ratio as needed
-              ),
-              itemCount: _orderData.length,
-              itemBuilder: (context, index) {
-                return
-
-
-                  ActiveOrderCard(
-                  id: _orderData[index]['id']!,
-                  orderDate: _orderData[index]['orderDate']!,
-                  payment: _orderData[index]['payment']!,
-                  orderStatus: _orderData[index]['orderStatus']!,
-                );
-
-              },
-            );
-          }
-          else {
-            // For smaller screens, use a single-column layout
-            return ListView(
-              padding: EdgeInsets.all(16),
-              children: _orderData
-                  .map(
-                    (data) => ActiveOrderCard(
-                  id: data['id']!,
-                  orderDate: data['orderDate']!,
-                  payment: data['payment']!,
-                  orderStatus: data['orderStatus']!,
-                ),
-              )
-                  .toList(),
-            );
-          }
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: () async {
+          // Implement the refresh logic here
+          setState(() {});
         },
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: fetchOrderData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Text('No orders found.');
+            } else {
+              List<Map<String, dynamic>> orderData = snapshot.data!;
+              // Filter orders based on status
+              List<Map<String, dynamic>> activeOrders = orderData
+                  .where((order) =>
+              order['status'] == 'Order Placed' ||
+                  order['status'] == 'In Progress')
+                  .toList();
+
+              // Group orders by payment ID
+              Map<String, List<Map<String, dynamic>>> groupedOrders = {};
+              activeOrders.forEach((order) {
+                String transId = order['trans_id'].toString();
+                if (!groupedOrders.containsKey(transId)) {
+                  groupedOrders[transId] = [];
+                }
+                groupedOrders[transId]!.add(order);
+              });
+
+              return OrdersList(
+                groupedOrders: groupedOrders,
+                mobileNumber: widget.mobileNumber,
+                refreshCallback: _refresh,
+              );
+            }
+          },
+        ),
       ),
     );
   }
 
-  final _orderData = [
-    {
-      'id': 'Order #12345',
-      'orderDate': '20, Nov',
-      'payment': '499.00',
-      'orderStatus': 'Order Placed',
-    },
-    {
-      'id': 'Order #54321',
-      'orderDate': '06, Nov',
-      'payment': '1299.00',
-      'orderStatus': 'In progress',
-    },
-    {
-      'id': 'Order #12341',
-      'orderDate': '16, Oct',
-      'payment': '1499.00',
-      'orderStatus': 'In progress',
-    },
-    {
-      'id': 'Order #75841',
-      'orderDate': '25, Oct',
-      'payment': '799.00',
-      'orderStatus': 'Order Placed',
-    },
-    // Add more order data as needed
-  ];
+  Future<List<Map<String, dynamic>>> fetchOrderData() async {
+    final apiUrl =
+        'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readorder';
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: {'mobile': widget.mobileNumber},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to load order data');
+    }
+  }
+}
+
+class OrdersList extends StatelessWidget {
+  final String mobileNumber;
+  final Map<String, List<Map<String, dynamic>>> groupedOrders;
+  final VoidCallback refreshCallback;
+
+  OrdersList(
+      {required this.groupedOrders,
+        required this.mobileNumber,
+        required this.refreshCallback});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: groupedOrders.length,
+      itemBuilder: (context, index) {
+        String transId = groupedOrders.keys.elementAt(index);
+        List<Map<String, dynamic>> orders = groupedOrders[transId]!;
+        return ActiveOrderCard(
+          id: transId,
+          orderDate: "Vegetable\n/Fruits", // You may want to change this
+          payment: orders[0]['ord_price'].toString(),
+          status: orders[0]['status'].toString(),
+          mobileNumber: mobileNumber,
+          refreshCallback: refreshCallback,
+        );
+      },
+    );
+  }
+}
+
+Future<void> cancelOrder(
+    String transactionId, String mobileNumber, VoidCallback refreshCallback) async {
+  try {
+    final apiUrl =
+        'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=cancelord';
+
+    // Print the parameters being passed
+    print('Cancel Order Request - Mobile: $mobileNumber, Transaction ID: $transactionId');
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: {
+        'mobile': mobileNumber,
+        'trans_id': transactionId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Handle success response
+      print('Order cancelled successfully');
+      print('Response Message: ${response.body}');
+      print('Cancel Order Request 2 - Mobile: $mobileNumber, Transaction ID: $transactionId');
+
+      // Trigger refresh after canceling order
+      refreshCallback();
+    } else {
+      // Handle error response
+      print('Failed to cancel order. Status code: ${response.statusCode}');
+      print('Error Message: ${response.body}');
+    }
+  } catch (e) {
+    // Handle exception
+    print('Exception while cancelling order: $e');
+  }
 }
 
 class ActiveOrderCard extends StatelessWidget {
+  final String mobileNumber;
   final String id;
   final String orderDate;
   final String payment;
-  final String orderStatus;
+  final String status;
+  final VoidCallback refreshCallback;
 
   ActiveOrderCard({
     required this.id,
     required this.orderDate,
     required this.payment,
-    required this.orderStatus,
+    required this.status,
+    required this.mobileNumber,
+    required this.refreshCallback,
   });
 
   @override
@@ -107,19 +189,19 @@ class ActiveOrderCard extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: orderStatus == 'Order Placed'
+                  color: status == 'In Progress'
                       ? Colors.amber.shade50
                       : Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  orderStatus,
+                  status,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: orderStatus == 'Order Placed'
-                        ? Colors.orange
-                        : Colors.blue,
+                    color: status == 'Order Placed'
+                        ? Colors.green
+                        : Colors.red.shade300,
                   ),
                 ),
               ),
@@ -188,33 +270,26 @@ class ActiveOrderCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 16),
-
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black12,
-                    width: 1), // Border decoration
-                borderRadius: BorderRadius.circular(1), // Adjust the border radius as needed
+                border: Border.all(color: Colors.black12, width: 1),
+                borderRadius: BorderRadius.circular(1),
               ),
             ),
             SizedBox(height: 16),
-
-            // SizedBox(height: 16),
-            // Divider(
-            //   color: Colors.black12,
-            //   thickness: 1,
-            // ),
-            // SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Implement cancel order action
+                    cancelOrder(id, mobileNumber, refreshCallback);
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.grey[100]),
+                    backgroundColor: MaterialStateProperty.all(
+                      Colors.grey[100],
+                    ),
                   ),
-                  child: Text('Cancel Order', style: TextStyle(color: Colors.green)),
+                  child: Text('Cancel Order', style: TextStyle(color: Colors.red)),
                 ),
                 ElevatedButton(
                   onPressed: () {

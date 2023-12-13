@@ -71,7 +71,7 @@ class APIService {
       double price = double.parse(cartItem['price']);
       double quantity = double.tryParse(cartItem['quantity']) ?? 0.0;
 
-      totalPrice += price * quantity;
+      totalPrice += price ;
     }
     return totalPrice;
   }
