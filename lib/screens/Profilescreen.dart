@@ -1,51 +1,40 @@
+import 'dart:convert';
+
 import 'package:ecom/HomePage1.dart';
 import 'package:ecom/Screens/Home_screen.dart';
 import 'package:ecom/User_Credentials/login_Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
-// class Profilescreen extends StatelessWidget {
-//   final String mobileNumber;
-//    Profilescreen({super.key,
-//     required this.mobileNumber});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title:  Text(
-//           'Profile',
-//           style: TextStyle(color: Colors.black),
-//         ),
-//         centerTitle: true,
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         leading: IconButton(
-//           onPressed: () {
-//             Navigator.pop(context);
-//           },
-//           icon: const Icon(Icons.arrow_back, color: Colors.black),
-//         ),
-//       ),
-//       body: LayoutBuilder(
-//         builder: (context, constraints) {
-//           if (constraints.maxWidth > 600) {
-//             // Use a two-column layout for larger screens
-//             return TwoColumnLayout(mobileNumber: mobileNumber,);
-//           } else {
-//             // Use a single-column layout for smaller screens
-//             return SingleColumnLayout(mobileNumber: mobileNumber,);
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
+
 
 class Profilescreen extends StatelessWidget {
-  final String? mobileNumber; // Make mobileNumber nullable
+  final String mobileNumber; // Make mobileNumber nullable
   Profilescreen({super.key, required this.mobileNumber});
+
+  Future<Map<String, dynamic>?> fetchUserInfo(String mobileNumber) async {
+    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readinfo';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {'mobile': mobileNumber},
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the response body
+      final Map<String, dynamic> data = json.decode(response.body);
+      return data;
+    } else {
+      // Handle the error
+      print('Failed to fetch user information. Error: ${response.body}');
+      return null;
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -60,40 +49,79 @@ class Profilescreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(mobileNumber: mobileNumber),
+              ),
+            );
+
+            // Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
       ),
-      body: LayoutBuilder(
+      body: (mobileNumber == null || mobileNumber!.isEmpty)
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Looks like you are not signed in...'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Text('Sign In to continue'),
+            ),
+          ],
+        ),
+      )
+          :LayoutBuilder(
         builder: (context, constraints) {
-          if (mobileNumber != null && mobileNumber!.isNotEmpty) {
-            // User is logged in, show the profile
-            if (constraints.maxWidth > 600) {
-              return TwoColumnLayout(mobileNumber: mobileNumber!);
-            } else {
-              return SingleColumnLayout(mobileNumber: mobileNumber!);
-            }
-          } else {
-            // User is not logged in, show "Sign In to continue" button
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Sign In to continue'),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
-                      );
-                    },
-                    child: Text('Sign In'),
+          return FutureBuilder<Map<String, dynamic>?>(
+            // Fetch user information asynchronously
+            future: fetchUserInfo(mobileNumber!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Display a loading indicator while fetching data
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                // Display an error message if there's an error
+                return       Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Looks like you are not signed in...'),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                          );
+                        },
+                        child: Text('Sign In to continue'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }
+                );
+
+              } else if (!snapshot.hasData || snapshot.data == null) {
+                // Display a message when no data is available
+                return Text('User information not available.');
+              } else {
+                // User information is available, display it
+                final userInfo = snapshot.data!;
+                return (constraints.maxWidth > 600)
+                    ? TwoColumnLayout(mobileNumber: mobileNumber!, userInfo: userInfo)
+                    : SingleColumnLayout(mobileNumber: mobileNumber!, userInfo: userInfo);
+              }
+            },
+          );
         },
       ),
     );
@@ -102,8 +130,12 @@ class Profilescreen extends StatelessWidget {
 
 class TwoColumnLayout extends StatelessWidget {
   final String mobileNumber;
+  final Map<String, dynamic> userInfo;
+
   TwoColumnLayout({
-    required this.mobileNumber});
+    required this.mobileNumber,
+    required this.userInfo,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,56 +145,57 @@ class TwoColumnLayout extends StatelessWidget {
           flex: 1,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const CircleAvatar(
-                  radius: 60,
-                  backgroundImage: AssetImage('assets/images/1.png'),
-                  backgroundColor: Colors.white,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: InkWell(
-                    onTap: () {
-                      // Handle the "Edit Profile" action here
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 60,
+                    backgroundImage: AssetImage('assets/images/1.png'),
+                    backgroundColor: Colors.white,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: InkWell(
+                      onTap: () {
+                        // Handle the "Edit Profile" action here
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Mobile ${mobileNumber}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  Text(
+                    'Mobile ${mobileNumber}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  'Shubham Mahajan Mobile ${mobileNumber}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  Text(
+                    'Username: ${userInfo['username']}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-
-              ],
+                ],
+              ),
             ),
           ),
         ),
         Expanded(
           flex: 1,
-          child: ProfileActions(mobileNumber: '${mobileNumber}',),
+          child: ProfileActions(mobileNumber: '${mobileNumber}'),
         ),
       ],
     );
@@ -171,10 +204,14 @@ class TwoColumnLayout extends StatelessWidget {
 
 class SingleColumnLayout extends StatelessWidget {
   final String mobileNumber;
+  final Map<String, dynamic> userInfo;
 
   SingleColumnLayout({
     required this.mobileNumber,
+    required this.userInfo,
+
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -215,19 +252,27 @@ class SingleColumnLayout extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Shubham Mahajan ',
+            '${userInfo['username']}',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            'mobile : ${mobileNumber}',
+            'Mobile : ${mobileNumber}',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
+          Text(
+            'email :${userInfo['email']}',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
           // Move the ProfileActions widget inside the SingleChildScrollView
           ProfileActions(mobileNumber: '${mobileNumber}'),
         ],

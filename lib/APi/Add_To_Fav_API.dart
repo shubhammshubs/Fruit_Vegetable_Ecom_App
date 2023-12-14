@@ -5,16 +5,16 @@ import 'package:http/http.dart' as http;
 // api_service.dart
 import 'package:http/http.dart' as http;
 
-class ApiService {
-  static Future<void> addToCart({
+class ApiServiceforFavItem {
+  static Future<void> addToFav({
     required String mobileNumber,
     required String productId,
-    required int selectedQuantity,
+    // required int selectedQuantity,
     required double totalPrice,
     required String title,
     required String image,
   }) async {
-    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=addtocart';
+    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=addtofav';
 
     try {
       final response = await http.post(
@@ -23,7 +23,7 @@ class ApiService {
         body: {
           'mobile': mobileNumber,
           'product_id': productId.toString(),
-          'quantity': selectedQuantity.toString(),
+          // 'quantity': selectedQuantity.toString(),
           'price': totalPrice.toString(),
           'product_title': title,
           'product_image': image,

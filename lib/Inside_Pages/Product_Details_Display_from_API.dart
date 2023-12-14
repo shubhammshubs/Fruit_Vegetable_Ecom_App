@@ -4,10 +4,13 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart' as http;
+import '../APi/Add_To_Cart_API.dart';
+import '../APi/Add_To_Fav_API.dart';
 import '../APi/Category_vegitable_API.dart';
 import '../APi/Product_class.dart';
 import '../HomePage1.dart';
 import '../User_Credentials/login_Screen.dart';
+import '../screens/FavoritesScreen.dart';
 import '../widgets/popular_items_slider.dart';
 
 class ProductDetailsPageFromAPI extends StatefulWidget {
@@ -76,72 +79,128 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
   }
 
 
+  // void addToCart() async {
+  //   final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=addtocart';
+  //
+  //   // Replace 'your_api_key_here' with the actual API key
+  //   // final apiKey = 'your_api_key_here';
+  //   // Replace 'your_mobile_number' and 'your_product_id' with actual values
+  //   final mobileNumber = widget.mobileNumber;
+  //   final productId = widget.product!.id.toString(); // Assuming product id is an int
+  //
+  //   final quantity = selectedQuantity.toString();
+  //   final price = totalPrice.toString(); // Use the updated total price
+  //   final title = widget.product!.title.toString();
+  //   final image = widget.product!.image.toString();
+  //
+  //   final response = await http.post(
+  //     Uri.parse(apiUrl),
+  //     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+  //     body: {
+  //       // 'api_key': apiKey,
+  //       'mobile': mobileNumber,
+  //       'product_id': productId,
+  //       'quantity': quantity,
+  //       'price': price,
+  //       'product_title': title,
+  //       'product_image': image,
+  //     },
+  //   );
+  //   if (mobileNumber != null && mobileNumber.isNotEmpty) {
+  //
+  //     if (response.statusCode == 200) {
+  //       // Successful request, handle the response as needed
+  //       print('Response Body: ${response.body}');
+  //       print('Item added to cart successfully Done');
+  //
+  //       // Navigate to the cart
+  //       Navigator.push(context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               AddToCartPage(mobileNumber: widget.mobileNumber, product: widget.product,)));
+  //     } else {
+  //       // Error handling, print the error message
+  //       print('Failed to add item to cart. Error: ${response.body}');
+  //     }
+  //   } else {
+  //     // User has not provided the mobile number, navigate to LoginScreen
+  //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(
+  //       // product: widget.product,
+  //     )));
+  //   }
+  //
+  //   // if (response.statusCode == 200) {
+  //   //   // Successful request, handle the response as needed
+  //   //   print('Response Body: ${response.body}');
+  //   //   // print(response.);
+  //   //   print('Item added to cart successfully Done');
+  //   //   // Show a SnackBar to inform the user that the item has been added
+  //   //   Navigator.push(context, MaterialPageRoute(builder: (context)=> AddToCartPage()));
+  //   //   final snackBar = SnackBar(
+  //   //       content: Text('Item has been added to the cart',
+  //   //         textAlign: TextAlign.center,));
+  //   //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //   //
+  //   // } else {
+  //   //   // Error handling, print the error message
+  //   //   print('Failed to add item to cart. Error: ${response.body}');
+  //   // }
+  // }
+
   void addToCart() async {
-    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=addtocart';
+    try {
+      await ApiService.addToCart(
+        mobileNumber: widget.mobileNumber,
+        productId: widget.product!.id,
+        selectedQuantity: selectedQuantity,
+        totalPrice: totalPrice,
+        title: widget.product!.title,
+        image: widget.product!.image,
+      );
 
-    // Replace 'your_api_key_here' with the actual API key
-    // final apiKey = 'your_api_key_here';
-    // Replace 'your_mobile_number' and 'your_product_id' with actual values
-    final mobileNumber = widget.mobileNumber;
-    final productId = widget.product!.id.toString(); // Assuming product id is an int
-
-    final quantity = selectedQuantity.toString();
-    final price = totalPrice.toString(); // Use the updated total price
-    final title = widget.product!.title.toString();
-    final image = widget.product!.image.toString();
-
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {
-        // 'api_key': apiKey,
-        'mobile': mobileNumber,
-        'product_id': productId,
-        'quantity': quantity,
-        'price': price,
-        'product_title': title,
-        'product_image': image,
-      },
-    );
-    if (mobileNumber != null && mobileNumber.isNotEmpty) {
-
-      if (response.statusCode == 200) {
-        // Successful request, handle the response as needed
-        print('Response Body: ${response.body}');
-        print('Item added to cart successfully Done');
-
-        // Navigate to the cart
-        Navigator.push(context, 
-            MaterialPageRoute(builder: (context) => 
-                AddToCartPage(mobileNumber: widget.mobileNumber, product: widget.product,)));
-      } else {
-        // Error handling, print the error message
-        print('Failed to add item to cart. Error: ${response.body}');
-      }
-    } else {
-      // User has not provided the mobile number, navigate to LoginScreen
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(
-        // product: widget.product,
-      )));
+      // Navigate to the cart
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddToCartPage(
+            mobileNumber: widget.mobileNumber,
+            product: widget.product,
+          ),
+        ),
+      );
+    } catch (error) {
+      // Handle errors
+      print('Error: $error');
     }
-
-    // if (response.statusCode == 200) {
-    //   // Successful request, handle the response as needed
-    //   print('Response Body: ${response.body}');
-    //   // print(response.);
-    //   print('Item added to cart successfully Done');
-    //   // Show a SnackBar to inform the user that the item has been added
-    //   Navigator.push(context, MaterialPageRoute(builder: (context)=> AddToCartPage()));
-    //   final snackBar = SnackBar(
-    //       content: Text('Item has been added to the cart',
-    //         textAlign: TextAlign.center,));
-    //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    //
-    // } else {
-    //   // Error handling, print the error message
-    //   print('Failed to add item to cart. Error: ${response.body}');
-    // }
   }
+
+
+  void addToFav() async {
+    try {
+      await ApiServiceforFavItem.addToFav(
+        mobileNumber: widget.mobileNumber,
+        productId: widget.product!.id,
+        // selectedQuantity: selectedQuantity,
+        totalPrice: totalPrice,
+        title: widget.product!.title,
+        image: widget.product!.image,
+      );
+
+      // Navigate to the cart
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FavoritesScreen(
+            mobileNumber: widget.mobileNumber,
+            // product: widget.product,
+          ),
+        ),
+      );
+    } catch (error) {
+      // Handle errors
+      print('Error: $error');
+    }
+  }
+
 
   // @override
   @override
@@ -193,6 +252,7 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
           IconButton(
             onPressed: () {
               setState(() {
+                addToFav();
                 // favoriteItems.add(widget.product);
                 final snackBar = SnackBar(
                     content: Text('Item has been added to the Favorites'));

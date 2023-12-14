@@ -177,7 +177,13 @@ class _AddToCartPageState extends State<AddToCartPage> {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
+              ),
+            );
+            // Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
@@ -202,7 +208,8 @@ class _AddToCartPageState extends State<AddToCartPage> {
         ),
       )
           : cartItems.isEmpty
-          ? Center(
+          ?
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -211,7 +218,8 @@ class _AddToCartPageState extends State<AddToCartPage> {
           ],
         ),
       )
-          : Column(
+          :
+      Column(
         children: [
           Expanded(
             child: ListView.builder(
@@ -288,7 +296,7 @@ class _AddToCartPageState extends State<AddToCartPage> {
 
                         )));
                   },
-                  child: Text('Test'),
+                  child: Text('Checkout'),
                 )
               ],
             ),

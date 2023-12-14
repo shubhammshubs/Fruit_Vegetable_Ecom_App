@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../HomePage1.dart';
 import 'OrderScreen_Navigators/Active_Orders.dart';
 import 'OrderScreen_Navigators/Cancle_Orders.dart';
 import 'OrderScreen_Navigators/Completed_Orders.dart';
@@ -92,7 +93,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
           elevation: 0,
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
+                ),
+              );
+
+              // Navigator.pop(context);
             },
             icon: const Icon(
               Icons.arrow_back,

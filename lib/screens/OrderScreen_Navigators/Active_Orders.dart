@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../User_Credentials/login_Screen.dart';
+
 class ActiveOrdersPage extends StatefulWidget {
   final String mobileNumber;
 
@@ -38,9 +40,26 @@ class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
           future: fetchOrderData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+              return       Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Looks like you are not signed in...'),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                        );
+                      },
+                      child: Text('Sign In to continue'),
+                    ),
+                  ],
+                ),
+              );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Text('No orders found.');
             } else {
