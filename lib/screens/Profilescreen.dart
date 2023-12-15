@@ -1,46 +1,23 @@
 import 'dart:convert';
-
-import 'package:ecom/HomePage1.dart';
-import 'package:ecom/Screens/Home_screen.dart';
-import 'package:ecom/User_Credentials/login_Screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-
-
+import '../APi/Add_To_Cart_API.dart';
+import '../APi/Display_User_info_API.dart';
+import '../HomePage1.dart';
+import '../User_Credentials/login_Screen.dart';
+import 'Check_Out_Screen/Delivery_Address.dart';
+import 'ProfilePage_Screens/Manage_Address.dart';  // Import ApiService
 
 class Profilescreen extends StatelessWidget {
-  final String mobileNumber; // Make mobileNumber nullable
-  Profilescreen({super.key, required this.mobileNumber});
+  final String mobileNumber;
 
-  Future<Map<String, dynamic>?> fetchUserInfo(String mobileNumber) async {
-    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readinfo';
-
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {'mobile': mobileNumber},
-    );
-
-    if (response.statusCode == 200) {
-      // Parse the response body
-      final Map<String, dynamic> data = json.decode(response.body);
-      return data;
-    } else {
-      // Handle the error
-      print('Failed to fetch user information. Error: ${response.body}');
-      return null;
-    }
-  }
-
-
+  Profilescreen({Key? key, required this.mobileNumber}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Profile',
           style: TextStyle(color: Colors.black),
         ),
@@ -55,8 +32,6 @@ class Profilescreen extends StatelessWidget {
                 builder: (context) => HomePage(mobileNumber: mobileNumber),
               ),
             );
-
-            // Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
@@ -66,8 +41,8 @@ class Profilescreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Looks like you are not signed in...'),
-            SizedBox(height: 20),
+            const Text('Looks like you are not signed in...'),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -75,50 +50,57 @@ class Profilescreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => LoginScreen()),
                 );
               },
-              child: Text('Sign In to continue'),
+              child: const Text('Sign In to continue'),
             ),
           ],
         ),
       )
-          :LayoutBuilder(
+          : LayoutBuilder(
         builder: (context, constraints) {
           return FutureBuilder<Map<String, dynamic>?>(
-            // Fetch user information asynchronously
-            future: fetchUserInfo(mobileNumber!),
+            // Fetch user information asynchronously using ApiService
+            future: ApiServiceaddress.fetchUserInfo(mobileNumber),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 // Display a loading indicator while fetching data
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 // Display an error message if there's an error
-                return       Center(
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Looks like you are not signed in...'),
-                      SizedBox(height: 20),
+                      const Text('Looks like you are not signed in...'),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
                           );
                         },
-                        child: Text('Sign In to continue'),
+                        child: const Text('Sign In to continue'),
                       ),
                     ],
                   ),
                 );
-
               } else if (!snapshot.hasData || snapshot.data == null) {
                 // Display a message when no data is available
-                return Text('User information not available.');
+                return const Text('User information not available.');
               } else {
                 // User information is available, display it
                 final userInfo = snapshot.data!;
                 return (constraints.maxWidth > 600)
-                    ? TwoColumnLayout(mobileNumber: mobileNumber!, userInfo: userInfo)
-                    : SingleColumnLayout(mobileNumber: mobileNumber!, userInfo: userInfo);
+                    ? TwoColumnLayout(
+                  mobileNumber: mobileNumber!,
+                  userInfo: userInfo,
+                )
+                    : SingleColumnLayout(
+                  mobileNumber: mobileNumber!,
+                  userInfo: userInfo,
+                );
               }
             },
           );
@@ -127,6 +109,8 @@ class Profilescreen extends StatelessWidget {
     );
   }
 }
+
+
 
 class TwoColumnLayout extends StatelessWidget {
   final String mobileNumber;
@@ -176,14 +160,14 @@ class TwoColumnLayout extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     'Mobile ${mobileNumber}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     'Username: ${userInfo['username']}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -222,7 +206,7 @@ class SingleColumnLayout extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Stack(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 60,
                   backgroundImage: AssetImage('assets/images/1.png'),
                   backgroundColor: Colors.white,
@@ -253,28 +237,35 @@ class SingleColumnLayout extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             '${userInfo['username']}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            'Mobile : ${mobileNumber}',
-            style: TextStyle(
+            'Mobile : $mobileNumber',
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             'email :${userInfo['email']}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
+          // Text(
+          //   '${userInfo['city']},${userInfo['state']}',
+          //   style: const TextStyle(
+          //     fontSize: 18,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          // ),
 
           // Move the ProfileActions widget inside the SingleChildScrollView
-          ProfileActions(mobileNumber: '${mobileNumber}'),
+          ProfileActions(mobileNumber: mobileNumber),
         ],
       ),
     );
@@ -292,7 +283,7 @@ class ProfileActions extends StatelessWidget {
     await prefs.clear(); // Clear all stored data, you might want to clear specific keys
 
     // Navigate to the login screen
-    final snackBar = SnackBar(content: Text('Successfully Logout'));
+    final snackBar = const SnackBar(content: Text('Successfully Logout'));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -305,55 +296,76 @@ class ProfileActions extends StatelessWidget {
     return  SingleChildScrollView(
       child: Column(
         children: [
-        Divider(
+        const Divider(
         color: Colors.black12,
         thickness: 1.5,
           indent: 20,
           endIndent: 20,
       ),
-          ListTile(
-            leading: Icon(Icons.location_pin, color: Colors.green),
-            title: Text('Manage Address'),
-            trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
-          ),
+        ListTile(
+          leading: Icon(Icons.location_pin, color: Colors.green),
+          title: Text('Manage Address'),
+          trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                // DeliveryAddressPage(),
+                    ManageAddress(mobileNumber: mobileNumber),
+              ),
+            );
+          },
+        ),
+
           ListTile(
             leading: Icon(Icons.credit_card, color: Colors.green),
             title: Text('Payment Methods'),
             trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) =>
+            //             DeliveryAddressPage(),
+            //         // ManageAddress(mobileNumber: mobileNumber),
+            //       ),
+            //     );
+            //   },
           ),
           // Add the rest of your ListTile items here
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.attach_money,color: Colors.green,),
             title: Text('My Wallet'),
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.card_giftcard,color: Colors.green,),
             title: Text('My Coupons'),
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.settings,color: Colors.green,),
             title: Text('Settings'),
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.help,color: Colors.green,),
             title: Text('Help Center'),
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.policy,color: Colors.green,),
             title: Text('Privacy Policy'),
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),
           ),
           ListTile(
-            leading: Icon(Icons.logout, color: Colors.green),
-            title: Text('Log out'),
-            trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
+            leading: const Icon(Icons.logout, color: Colors.green),
+            title: const Text('Log out'),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
             onTap: () => _logout(context), // Trigger the logout function
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.share,color: Colors.green,),
             title: Text('Invites Friends'),
             trailing: Icon(Icons.arrow_forward_ios_rounded,color: Colors.green,),

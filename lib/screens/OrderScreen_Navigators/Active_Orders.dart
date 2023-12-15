@@ -30,7 +30,26 @@ class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
+      body: (widget.mobileNumber == null || widget.mobileNumber.isEmpty)
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Looks like you are not signed in...'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Text('Sign In to continue'),
+            ),
+          ],
+        ),
+      )
+          : RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: () async {
           // Implement the refresh logic here
@@ -42,24 +61,25 @@ class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return       Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Looks like you are not signed in...'),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
-                        );
-                      },
-                      child: Text('Sign In to continue'),
-                    ),
-                  ],
-                ),
-              );
+              return Center(child: Text('No orders found.'));
+              // return       Center(
+              //   child: Column(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Text('Looks like you are not signed in...'),
+              //       SizedBox(height: 20),
+              //       ElevatedButton(
+              //         onPressed: () {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(builder: (context) => LoginScreen()),
+              //           );
+              //         },
+              //         child: Text('Sign In to continue'),
+              //       ),
+              //     ],
+              //   ),
+              // );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Text('No orders found.');
             } else {

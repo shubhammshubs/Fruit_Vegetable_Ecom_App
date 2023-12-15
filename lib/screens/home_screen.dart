@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../APi/Display_User_info_API.dart';
 import '../Inside_Pages/Notification_page.dart';
 import '../widgets/best_deals_slider.dart';
 import '../widgets/category_slider.dart';
@@ -11,15 +12,38 @@ import '../widgets/search_bar.dart';
 import 'Category.dart';
 
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final String mobileNumber;
 
   HomeScreen({required this.mobileNumber});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Map<String, dynamic>? addressInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user information when the screen is initialized
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    try {
+      final data = await ApiServiceaddress.fetchUserInfo(widget.mobileNumber);
+      setState(() {
+        addressInfo = data;
+      });
+    } catch (e) {
+      // Handle the error, e.g., show an error message
+      print('Error fetching user information: $e');
+    }
+  }
+
   // final String mobileNumber;
-  //
-  // // Constructor with named parameter
-  // HomeScreen({Key? key, this.mobileNumber = ''}) : super(key: key);
   Future<void> logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -63,7 +87,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 26,),
-                Text("mobile:  ${mobileNumber}"),
+                Text("mobile:  ${widget.mobileNumber}"),
                 Text('Location',
                   style: TextStyle(color: Colors.black54,
                     fontFamily: "NexaRegular",
@@ -72,13 +96,18 @@ class HomeScreen extends StatelessWidget {
                 Row(
                   children: [
                     Icon(Icons.location_on,color: Colors.green,),
-                    Text(
-                      'Pune City,India',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.0,
-                      ),
-                    ),
+           Text(
+             addressInfo != null &&
+                 addressInfo!.containsKey('address') &&
+                 addressInfo!['address'] != null &&
+                 addressInfo!['address'].isNotEmpty
+                 ? '${addressInfo!['city']}, ${addressInfo!['state']}'
+                 : '',
+             style: TextStyle(
+               fontWeight: FontWeight.bold,
+               fontSize: 18.0,
+             ),
+           ),
                   ],
                 ),
 
@@ -116,7 +145,7 @@ class HomeScreen extends StatelessWidget {
 
             Container(
                 child:
-                PopularItems1Slider(productCategory: 'Vegetable', mobileNumber: mobileNumber,),
+                PopularItems1Slider(productCategory: 'Vegetable', mobileNumber: widget.mobileNumber,),
                 // ImageSlider(),
             ),
             // -----------------------------Image slider Category Section Code-------------------------------
@@ -140,7 +169,7 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => CategoryPage(mobileNumber: mobileNumber,), // Use your CategoryPage widget
+                            builder: (context) => CategoryPage(mobileNumber: widget.mobileNumber,), // Use your CategoryPage widget
                           ),
                         );
                       },
@@ -163,13 +192,13 @@ class HomeScreen extends StatelessWidget {
                     Container(
                       height: 120.0,
                       child: CategoryItem(category:
-                      categories[0], mobileNumber: mobileNumber,), // Display the first category
+                      categories[0], mobileNumber: widget.mobileNumber,), // Display the first category
                     ),
                     // SizedBox(width: 4,),
                     Container(
                       height: 120.0,
                       child: CategoryItem(category:
-                      categories[1], mobileNumber: mobileNumber,), // Display the first category
+                      categories[1], mobileNumber: widget.mobileNumber,), // Display the first category
                     ),
                     // SizedBox(width: 14,),
                     // Container(
@@ -210,7 +239,7 @@ class HomeScreen extends StatelessWidget {
                   height: 250.0, // Set a suitable height
                   child:
                   // BestDealsSlider(productCategory: 'Vegetable',),
-                  BestDealsSlider(mobileNumber: mobileNumber,),
+                  BestDealsSlider(mobileNumber: widget.mobileNumber,),
                 ),
               ],
             ),
@@ -226,7 +255,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 6,),
                 Container(
                   height: 250.0, // Set a suitable height
-                  child: PopularItemsSlider(mobileNumber: mobileNumber,),
+                  child: PopularItemsSlider(mobileNumber: widget.mobileNumber,),
                 ),
               ],
             ),

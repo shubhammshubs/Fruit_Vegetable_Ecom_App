@@ -471,59 +471,81 @@ class CompletedOrdersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: fetchOrderData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return       Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Looks like you are not signed in...'),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  },
-                  child: Text('Sign In to continue'),
-                ),
-              ],
+    return Scaffold(
+      body: (mobileNumber == null || mobileNumber.isEmpty)
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Looks like you are not signed in...'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Text('Sign In to continue'),
             ),
-          );
-
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Text('No orders found.');
-        } else {
-          List<Map<String, dynamic>> orderData = snapshot.data!;
-          // Filter orders based on status
-          List<Map<String, dynamic>> activeOrders = orderData
-              .where((order) =>
-          order['status'] == 'Delivered')
-              .toList();
-
-          // Group orders by payment ID
-          Map<String, List<Map<String, dynamic>>> groupedOrders = {};
-          activeOrders.forEach((order) {
-            String transId = order['trans_id'].toString();
-            if (!groupedOrders.containsKey(transId)) {
-              groupedOrders[transId] = [];
-            }
-            groupedOrders[transId]!.add(order);
-          });
-
-          return Scaffold(
-            // appBar: AppBar(
-            //   title: Text('Active Orders ${mobileNumber}'),
-            // ),
-            body: OrdersList(groupedOrders: groupedOrders),
-          );
-        }
-      },
+          ],
+        ),
+      )
+          : FutureBuilder<List<Map<String, dynamic>>>(
+        future: fetchOrderData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('No orders found.'));
+            // return       Center(
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       Text('Looks like you are not signed in...'),
+            //       SizedBox(height: 20),
+            //       ElevatedButton(
+            //         onPressed: () {
+            //           Navigator.push(
+            //             context,
+            //             MaterialPageRoute(builder: (context) => LoginScreen()),
+            //           );
+            //         },
+            //         child: Text('Sign In to continue'),
+            //       ),
+            //     ],
+            //   ),
+            // );
+      
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Text('No orders found.');
+          } else {
+            List<Map<String, dynamic>> orderData = snapshot.data!;
+            // Filter orders based on status
+            List<Map<String, dynamic>> activeOrders = orderData
+                .where((order) =>
+            order['status'] == 'Delivered')
+                .toList();
+      
+            // Group orders by payment ID
+            Map<String, List<Map<String, dynamic>>> groupedOrders = {};
+            activeOrders.forEach((order) {
+              String transId = order['trans_id'].toString();
+              if (!groupedOrders.containsKey(transId)) {
+                groupedOrders[transId] = [];
+              }
+              groupedOrders[transId]!.add(order);
+            });
+      
+            return Scaffold(
+              // appBar: AppBar(
+              //   title: Text('Active Orders ${mobileNumber}'),
+              // ),
+              body: OrdersList(groupedOrders: groupedOrders),
+            );
+          }
+        },
+      ),
     );
   }
 

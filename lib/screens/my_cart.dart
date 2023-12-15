@@ -65,20 +65,38 @@ class _AddToCartPageState extends State<AddToCartPage> {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: {'mobile': mobileNumber},
     );
-
     if (response.statusCode == 200) {
       // Parse the response body
-      final List<dynamic> data = json.decode(response.body);
+      final dynamic data = json.decode(response.body);
 
-      // Update the state with the cart items
-      setState(() {
-        cartItems = List<Map<String, dynamic>>.from(data);
-      });
+      // Check if the data is a List<dynamic>
+      if (data is List<dynamic>) {
+        // Update the state with the cart items
+        setState(() {
+          cartItems = List<Map<String, dynamic>>.from(data);
+        });
+      } else {
+        print('No Data in Cart: $data');
+        // Handle the error appropriately, e.g., show a message to the user
+      }
     } else {
       // Handle the error
       print('Failed to fetch cart items. Error: ${response.body}');
     }
   }
+  //   if (response.statusCode == 200) {
+  //     // Parse the response body
+  //     final List<dynamic> data = json.decode(response.body);
+  //
+  //     // Update the state with the cart items
+  //     setState(() {
+  //       cartItems = List<Map<String, dynamic>>.from(data);
+  //     });
+  //   } else {
+  //     // Handle the error
+  //     print('Failed to fetch cart items. Error: ${response.body}');
+  //   }
+  // }
 
   // Future<String?> showPaymentIdDialog(BuildContext context) async {
   //   TextEditingController paymentIdController = TextEditingController();

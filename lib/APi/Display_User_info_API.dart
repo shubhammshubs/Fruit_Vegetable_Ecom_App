@@ -1,0 +1,24 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+class ApiServiceaddress {
+  static Future<Map<String, dynamic>?> fetchUserInfo(String mobileNumber) async {
+    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readinfo';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {'mobile': mobileNumber},
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the response body
+      final Map<String, dynamic> data = json.decode(response.body);
+      return data;
+    } else {
+      // Handle the error
+      print('Failed to fetch user information. Error: ${response.body}');
+      return null;
+    }
+  }
+}

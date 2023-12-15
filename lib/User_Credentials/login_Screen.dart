@@ -5,6 +5,7 @@ import 'package:ecom/User_Credentials/Forgot_Password_OTP_Screen.dart';
 import 'package:ecom/User_Credentials/Signup_Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -181,6 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icon(Icons.mobile_friendly),
                       border: OutlineInputBorder(),
                     ),
+                    maxLength: 10,  // Set the maximum length
+                    // maxLengthEnforcement: MaxLengthEnforcement.enforced,
                     onChanged: (String value) {},
                     validator: (value) {
                       if (value!.isEmpty) {
