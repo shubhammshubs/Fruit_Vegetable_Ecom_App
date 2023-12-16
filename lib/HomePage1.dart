@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:ecom/screens/FavoritesScreen.dart';
 import 'package:ecom/screens/OrdersScreen.dart';
 import 'package:ecom/screens/Profilescreen.dart';
@@ -13,6 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Inside_Pages/product_details_pg_1.dart';
+import 'Notification_Controller.dart';
 import 'User_Credentials/login_Screen.dart';
 
 
@@ -64,7 +66,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod:
+      NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+      NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+      NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+      NotificationController.onDismissActionReceivedMethod,
+    );
 
     // Initialize _pages here where widget is accessible
     _pages = [

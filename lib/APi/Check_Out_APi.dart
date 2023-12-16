@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -46,7 +47,7 @@ class APIService {
       print('API Body: ${response.body}');
 
       if (response.statusCode == 200 &&
-          response.body == 'Successfully added to Cart.') {
+          response.body == "Order placed Successfully.") {
         final snackBar = SnackBar(
           content: Text(
             'Item ${cartItem['product_title']} added to Cart.',
@@ -54,8 +55,27 @@ class APIService {
           ),
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
       } else {
         print('Failed to upload item to the order. Error: ${response.body}');
+
+        final snackBar = SnackBar(
+          content: Text(
+            'Your Oder has been Placed for ${cartItem['quantity']} ${cartItem['product_title']}',
+            textAlign: TextAlign.center,
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: 1,
+            channelKey: "Basic_channel",
+            title: "Congratulation...",
+            body: "Your Order has been Placed. Use this transaction id $transId for future reference.",
+          ),
+
+        );
       }
     }
 
@@ -63,7 +83,10 @@ class APIService {
       context,
       MaterialPageRoute(builder: (context) => HomePage(mobileNumber: mobileNumber)),
     );
-  }
+
+
+
+    }
 
   static double calculateTotalPrice(List<Map<String, dynamic>> cartItems) {
     double totalPrice = 0.0;

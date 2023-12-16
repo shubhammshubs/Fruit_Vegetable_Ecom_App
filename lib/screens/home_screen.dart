@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? addressInfo;
+  int notificationCount = 0;
 
   @override
   void initState() {
@@ -117,7 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 // Your notification action
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => NotificationPage())
+                  MaterialPageRoute(builder: (context) => NotificationPage(
+                    mobileNumber: widget.mobileNumber,
+                  ))
                 );
               },
               icon: Icon(

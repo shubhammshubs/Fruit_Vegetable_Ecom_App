@@ -265,10 +265,10 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                 paymentOption: selectedOption,
               );
 
-              final snackBar = SnackBar(
-                content: Text('$selectedOption is Selected for Payment', textAlign: TextAlign.center),
-              );
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              // final snackBar = SnackBar(
+              //   content: Text('$selectedOption is Selected for Payment', textAlign: TextAlign.center),
+              // );
+              // ScaffoldMessenger.of(context).showSnackBar(snackBar);
             }
           },
 
