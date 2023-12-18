@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
 import '../APi/Display_User_info_API.dart';
+import '../APi/Notification_API.dart';
 import '../Inside_Pages/Notification_page.dart';
 import '../widgets/best_deals_slider.dart';
 import '../widgets/category_slider.dart';
@@ -28,8 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch user information when the screen is initialized
+    // Fetch user information and notification count when the screen is initialized
     fetchUserInfo();
+    fetchNotificationCount();
+  }
+
+  Future<void> fetchNotificationCount() async {
+    try {
+      final notificationApi = NotificationCountApi(mobileNumber: widget.mobileNumber);
+      final count = await notificationApi.fetchNotificationCount();
+
+      setState(() {
+        notificationCount = count;
+      });
+      print('Notification Count: $notificationCount');
+    } catch (e) {
+      // Handle other errors
+      print('Error fetching notification count: $e');
+    }
   }
 
   Future<void> fetchUserInfo() async {
@@ -115,21 +134,64 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             IconButton(
+              key: ValueKey(notificationCount),
               onPressed: () {
-                // Your notification action
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => NotificationPage(
-                    mobileNumber: widget.mobileNumber,
-                  ))
+                  MaterialPageRoute(
+                    builder: (context) => NotificationPage(
+                      mobileNumber: widget.mobileNumber,
+                    ),
+                  ),
                 );
               },
-              icon: Icon(
-
-                Icons.notifications,
-                color: Colors.black,
+              icon: Stack(
+                children: [
+                  Icon(
+                    Icons.notifications,
+                    color: Colors.black,
+                    size: 30,
+                  ),
+                  if (notificationCount > 0)
+                    Positioned(
+                      top: 1,  // Adjust the top value to move the count slightly up
+                      right: 2,  // Adjust the right value to position it correctly
+                      child: Container(
+                        padding: EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '$notificationCount',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              iconSize: 25,
             ),
+
+
+
+            // IconButton(
+            //   onPressed: () {
+            //     // Your notification action
+            //     Navigator.of(context).push(
+            //       MaterialPageRoute(builder: (context) => NotificationPage(
+            //         mobileNumber: widget.mobileNumber,
+            //       ))
+            //     );
+            //   },
+            //   icon: Icon(
+            //
+            //     Icons.notifications,
+            //     color: Colors.black,
+            //   ),
+            //   iconSize: 25,
+            // ),
 
             // Icon(Icons.ice_skating),
           ],
@@ -203,23 +265,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: CategoryItem(category:
                       categories[1], mobileNumber: widget.mobileNumber,), // Display the first category
                     ),
-                    // SizedBox(width: 14,),
-                    // Container(
-                    //   height: 120.0,
-                    //   child: CategoryItem(category:
-                    //   categories[2]), // Display the first category
-                    // ),
-                    // SizedBox(width: 14,),
-                    // Container(
-                    //   height: 120.0,
-                    //   child: CategoryItem(category:
-                    //   categories[3]), // Display the first category
-                    // ),
-                    // Container(
-                    //   height: 120.0,
-                    //   child: CategoryItem(category:
-                    //   categories[4]), // Display the first category
-                    // ),
                   ],
                 ),
 

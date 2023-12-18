@@ -5,6 +5,7 @@ import '../APi/Add_To_Cart_API.dart';
 import '../APi/Display_User_info_API.dart';
 import '../HomePage1.dart';
 import '../User_Credentials/login_Screen.dart';
+import '../widgets/AddressPopUp.dart';
 import 'Check_Out_Screen/Delivery_Address.dart';
 import 'ProfilePage_Screens/Manage_Address.dart';  // Import ApiService
 
@@ -318,21 +319,15 @@ class ProfileActions extends StatelessWidget {
           },
         ),
 
-          ListTile(
-            leading: Icon(Icons.credit_card, color: Colors.green),
-            title: Text('Payment Methods'),
-            trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) =>
-            //             DeliveryAddressPage(),
-            //         // ManageAddress(mobileNumber: mobileNumber),
-            //       ),
-            //     );
-            //   },
-          ),
+      ListTile(
+        leading: Icon(Icons.credit_card, color: Colors.green),
+        title: Text('Manage Address'),
+        trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
+        // onTap: () {
+        //   // Use the addressInfo here
+        //   AddressPopup.showAddressDialog(context, mobileNumber,);
+        // },
+      ),
           // Add the rest of your ListTile items here
           const ListTile(
             leading: Icon(Icons.attach_money,color: Colors.green,),

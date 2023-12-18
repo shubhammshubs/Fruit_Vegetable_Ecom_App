@@ -186,10 +186,13 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+
+import '../APi/Notification_API.dart';
 
 class NotificationPage extends StatefulWidget {
   final String mobileNumber;
@@ -206,27 +209,10 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
-    _data = fetchNotificationData(widget.mobileNumber);
+    // _data = fetchNotificationData(widget.mobileNumber);
   }
 
-  Future<List<Map<String, dynamic>>> fetchNotificationData(String mobile) async {
-    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readnote';
 
-    final mobileNumber = widget.mobileNumber;
-
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {'mobile': mobileNumber},
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return List<Map<String, dynamic>>.from(data);
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -247,14 +233,20 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _data,
+        future: NotificationApiHandler.fetchNotificationData(widget.mobileNumber),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('You Have No New Notification.'));
           } else {
-            final List<Map<String, dynamic>> data = snapshot.data!;
+            // final List<Map<String, dynamic>> data = snapshot.data!;
+            List<Map<String, dynamic>> data = snapshot.data!;
+            data.sort((a, b) => DateTime.parse(b['ord_date']).compareTo(DateTime.parse(a['ord_date'])));
+
+
+
+
             return ListView.builder(
               itemCount: data.length,
               itemBuilder: (context, index) {
@@ -313,50 +305,106 @@ class _NotificationPageState extends State<NotificationPage> {
       'Delivery Failed for order id ${item['trans_id']}.';
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            contentPadding: EdgeInsets.all(0), // Remove ListTile's default padding
-            leading: Icon(
-              Icons.notifications,
-              color: Colors.green,
-              size: 30,
-            ),
-            title: Text(
-              status,
-              style: TextStyle(fontWeight: FontWeight.bold,
-                color: (status == 'Cancelled' || status == 'Delivery Failed') ? Colors.red : Colors.green,
+    return GestureDetector(
+      onTap: () {
+        // Handle the tap event here, for example, navigate to a new screen
+        fetchAdditionalNotificationData(item['trans_id']);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.all(0), // Remove ListTile's default padding
+              leading: Icon(
+                Icons.notifications,
+                color: Colors.green,
+                size: 30,
               ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Text(
-                //   'Order ID: ${item['trans_id']}',
-                //   style: TextStyle(color: Colors.grey),
-                // ),
-                if (orderMessage.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      orderMessage,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        // color: status == 'Cancelled' ? Colors.red : Colors.green,
+              title: Text(
+                status,
+                style: TextStyle(fontWeight: FontWeight.bold,
+                  color: (status == 'Cancelled' || status == 'Delivery Failed') ? Colors.red : Colors.green,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text(
+                  //   'Order ID: ${item['trans_id']}',
+                  //   style: TextStyle(color: Colors.grey),
+                  // ),
+                  if (orderMessage.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        orderMessage,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          // color: status == 'Cancelled' ? Colors.red : Colors.green,
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
+  Future<void> fetchAdditionalNotificationData(String transId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=notify'),
+        body: {'mobile': widget.mobileNumber, 'trans_id': transId},
+      );
 
+      print('API Response: ${response.body}'); // Print the response for debugging
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: 'The Id $transId is Read',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        // Check if the response is the expected "Done" string
+        if (response.body == 'Done') {
+          // Show a message or perform actions accordingly
+
+          // showDialog(
+          //   context: context,
+          //   builder: (BuildContext context) {
+          //     return AlertDialog(
+          //       title: Text('Additional Notification Data'),
+          //       content: Text('The API response is "Done".'),
+          //       actions: [
+          //         TextButton(
+          //           onPressed: () {
+          //             Navigator.of(context).pop();
+          //           },
+          //           child: Text('Close'),
+          //         ),
+          //       ],
+          //     );
+          //   },
+          // );
+        } else {
+          // Handle the case where the response is not as expected
+          print('Unexpected response: ${response.body}');
+        }
+      } else {
+        // Handle the error
+        print('Error fetching additional notification data: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle other errors
+      print('Error fetching additional notification data: $e');
+    }
+  }
 }
 
