@@ -25,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   Map<String, dynamic>? addressInfo;
   int notificationCount = 0;
 
@@ -34,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Fetch user information and notification count when the screen is initialized
     fetchUserInfo();
     fetchNotificationCount();
+    onRefresh();
+
   }
 
   Future<void> fetchNotificationCount() async {
@@ -44,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         notificationCount = count;
       });
-      print('Notification Count: $notificationCount');
+      // print('Notification Count: $notificationCount');
     } catch (e) {
       // Handle other errors
       print('Error fetching notification count: $e');
@@ -79,6 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
     // );
   }
 
+  Future<void> onRefresh() async {
+    // Perform operations when the user pulls to refresh
+    await fetchUserInfo();
+    await fetchNotificationCount();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,222 +101,233 @@ class _HomeScreenState extends State<HomeScreen> {
       //   title: const Text("Grocery App",
       //     style: TextStyle(color: Colors.black),),
       // ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // User's Location
-         Padding(
-        padding: EdgeInsets.all(16.0),
+      body: RefreshIndicator(
+        onRefresh: onRefresh,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // User's Location
+           Padding(
+          padding: EdgeInsets.all(16.0),
 
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 26,),
-                Text("mobile:  ${widget.mobileNumber}"),
-                Text('Location',
-                  style: TextStyle(color: Colors.black54,
-                    fontFamily: "NexaRegular",
-                  ),),
-                SizedBox(height: 6,),
-                Row(
-                  children: [
-                    Icon(Icons.location_on,color: Colors.green,),
-           Text(
-             addressInfo != null &&
-                 addressInfo!.containsKey('address') &&
-                 addressInfo!['address'] != null &&
-                 addressInfo!['address'].isNotEmpty
-                 ? '${addressInfo!['city']}, ${addressInfo!['state']}'
-                 : '',
-             style: TextStyle(
-               fontWeight: FontWeight.bold,
-               fontSize: 18.0,
-             ),
-           ),
-                  ],
-                ),
-
-              ],
-            ),
-            IconButton(
-              key: ValueKey(notificationCount),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => NotificationPage(
-                      mobileNumber: widget.mobileNumber,
-                    ),
-                  ),
-                );
-              },
-              icon: Stack(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.notifications,
-                    color: Colors.black,
-                    size: 30,
+                  SizedBox(height: 26,),
+                  Text("mobile:  ${widget.mobileNumber}"),
+                  Text('Location',
+                    style: TextStyle(color: Colors.black54,
+                      fontFamily: "NexaRegular",
+                    ),),
+                  SizedBox(height: 6,),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on,color: Colors.green,),
+             Text(
+               addressInfo != null &&
+                   addressInfo!.containsKey('address') &&
+                   addressInfo!['address'] != null &&
+                   addressInfo!['address'].isNotEmpty
+                   ? '${addressInfo!['city']}, ${addressInfo!['state']}'
+                   : '',
+               style: TextStyle(
+                 fontWeight: FontWeight.bold,
+                 fontSize: 18.0,
+               ),
+             ),
+                    ],
                   ),
-                  if (notificationCount > 0)
-                    Positioned(
-                      top: 1,  // Adjust the top value to move the count slightly up
-                      right: 2,  // Adjust the right value to position it correctly
-                      child: Container(
-                        padding: EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '$notificationCount',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
+
                 ],
               ),
-            ),
-
-
-
-            // IconButton(
-            //   onPressed: () {
-            //     // Your notification action
-            //     Navigator.of(context).push(
-            //       MaterialPageRoute(builder: (context) => NotificationPage(
-            //         mobileNumber: widget.mobileNumber,
-            //       ))
-            //     );
-            //   },
-            //   icon: Icon(
-            //
-            //     Icons.notifications,
-            //     color: Colors.black,
-            //   ),
-            //   iconSize: 25,
-            // ),
-
-            // Icon(Icons.ice_skating),
-          ],
-        ),
-      ),
-
-            Container(
-              // height: 200.0, // Set a suitable height
-              child: SearchBartool(),
-            ),
-
-            SizedBox(height: 25,),
-            // Text('Mobile: $mobileNumber'),
-
-            // -----------------------------Image slider Code-------------------------------
-
-            Container(
-                child:
-                PopularItems1Slider(productCategory: 'Vegetable', mobileNumber: widget.mobileNumber,),
-                // ImageSlider(),
-            ),
-            // -----------------------------Image slider Category Section Code-------------------------------
-            SizedBox(height: 25,),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '  Category',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Colors.black,
-                        fontFamily: "NexaRegular",
+              IconButton(
+                key: ValueKey(notificationCount),
+                onPressed: () async {
+                  final shouldRefresh = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationPage(
+                        mobileNumber: widget.mobileNumber,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => CategoryPage(mobileNumber: widget.mobileNumber,), // Use your CategoryPage widget
+                  );
+
+                  // Check if the result indicates that the page should be refreshed
+                  if (shouldRefresh == true) {
+                    await fetchUserInfo();
+                    await fetchNotificationCount();
+                  }
+                },
+                icon: Stack(
+                  children: [
+                    Icon(
+                      Icons.notifications,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                    if (notificationCount > 0)
+                      Positioned(
+                        top: 1,
+                        right: 2,
+                        child: Container(
+                          padding: EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
                           ),
-                        );
-                      },
-                      child:  Text(
-                        'See All  ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.green, // Customize the button text color
+                          child: Text(
+                            '$notificationCount',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
-
-                SizedBox(height: 6,),
-                //==================Fetched this Category items from Category page===============================
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      height: 120.0,
-                      child: CategoryItem(category:
-                      categories[0], mobileNumber: widget.mobileNumber,), // Display the first category
-                    ),
-                    // SizedBox(width: 4,),
-                    Container(
-                      height: 120.0,
-                      child: CategoryItem(category:
-                      categories[1], mobileNumber: widget.mobileNumber,), // Display the first category
-                    ),
-                  ],
-                ),
+              ),
 
 
-              ],
-            )
-,
-            // -----------------------------Best Deal code-------------------------------
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('  Best Deal',
-                  style: TextStyle(fontSize: 25,color: Colors.black,
-                    fontFamily: "NexaRegular",
-                  ),
-                ),
-                SizedBox(height: 6,),
-                Container(
-                  height: 250.0, // Set a suitable height
+
+              // IconButton(
+              //   onPressed: () {
+              //     // Your notification action
+              //     Navigator.of(context).push(
+              //       MaterialPageRoute(builder: (context) => NotificationPage(
+              //         mobileNumber: widget.mobileNumber,
+              //       ))
+              //     );
+              //   },
+              //   icon: Icon(
+              //
+              //     Icons.notifications,
+              //     color: Colors.black,
+              //   ),
+              //   iconSize: 25,
+              // ),
+
+              // Icon(Icons.ice_skating),
+            ],
+          ),
+        ),
+
+              Container(
+                // height: 200.0, // Set a suitable height
+                child: SearchBartool(),
+              ),
+
+              SizedBox(height: 25,),
+              // Text('Mobile: $mobileNumber'),
+
+              // -----------------------------Image slider Code-------------------------------
+
+              Container(
                   child:
-                  // BestDealsSlider(productCategory: 'Vegetable',),
-                  BestDealsSlider(mobileNumber: widget.mobileNumber,),
-                ),
-              ],
-            ),
-            // -----------------------------Popular Item code-------------------------------
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('  Popular Item',
-                  style: TextStyle(fontSize: 25,color: Colors.black,
-                    fontFamily: "NexaRegular",
+                  PopularItems1Slider(productCategory: 'Vegetable', mobileNumber: widget.mobileNumber,),
+                  // ImageSlider(),
+              ),
+              // -----------------------------Image slider Category Section Code-------------------------------
+              SizedBox(height: 25,),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '  Category',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.black,
+                          fontFamily: "NexaRegular",
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => CategoryPage(mobileNumber: widget.mobileNumber,), // Use your CategoryPage widget
+                            ),
+                          );
+                        },
+                        child:  Text(
+                          'See All  ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.green, // Customize the button text color
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 6,),
-                Container(
-                  height: 250.0, // Set a suitable height
-                  child: PopularItemsSlider(mobileNumber: widget.mobileNumber,),
-                ),
-              ],
-            ),
-          ],
+
+                  SizedBox(height: 6,),
+                  //==================Fetched this Category items from Category page===============================
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: 120.0,
+                        child: CategoryItem(category:
+                        categories[0], mobileNumber: widget.mobileNumber,), // Display the first category
+                      ),
+                      // SizedBox(width: 4,),
+                      Container(
+                        height: 120.0,
+                        child: CategoryItem(category:
+                        categories[1], mobileNumber: widget.mobileNumber,), // Display the first category
+                      ),
+                    ],
+                  ),
+
+
+                ],
+              )
+        ,
+              // -----------------------------Best Deal code-------------------------------
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('  Best Deal',
+                    style: TextStyle(fontSize: 25,color: Colors.black,
+                      fontFamily: "NexaRegular",
+                    ),
+                  ),
+                  SizedBox(height: 6,),
+                  Container(
+                    height: 250.0, // Set a suitable height
+                    child:
+                    // BestDealsSlider(productCategory: 'Vegetable',),
+                    BestDealsSlider(mobileNumber: widget.mobileNumber,),
+                  ),
+                ],
+              ),
+              // -----------------------------Popular Item code-------------------------------
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('  Popular Item',
+                    style: TextStyle(fontSize: 25,color: Colors.black,
+                      fontFamily: "NexaRegular",
+                    ),
+                  ),
+                  SizedBox(height: 6,),
+                  Container(
+                    height: 250.0, // Set a suitable height
+                    child: PopularItemsSlider(mobileNumber: widget.mobileNumber,),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

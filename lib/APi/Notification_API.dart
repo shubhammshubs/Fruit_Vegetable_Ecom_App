@@ -1,9 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+// This code is for the Display the list of notification from the api to the notification Page.
 class NotificationApiHandler {
   static Future<List<Map<String, dynamic>>> fetchNotificationData(String mobile) async {
-    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readnote';
+    final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=readorder';
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -88,7 +88,7 @@ class NotificationApiHandler {
 
 
 
-
+// This is for the Dispaly the count on the Home Screen
 class NotificationCountApi {
   final String mobileNumber;
 

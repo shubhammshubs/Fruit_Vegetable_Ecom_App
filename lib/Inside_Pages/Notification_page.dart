@@ -193,6 +193,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 
 import '../APi/Notification_API.dart';
+import '../HomePage1.dart';
 
 class NotificationPage extends StatefulWidget {
   final String mobileNumber;
@@ -205,11 +206,12 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   late Future<List<Map<String, dynamic>>> _data;
+  Set<String> readItemIds = {}; // Keep track of read items
 
   @override
   void initState() {
     super.initState();
-    // _data = fetchNotificationData(widget.mobileNumber);
+    _data = NotificationApiHandler.fetchNotificationData(widget.mobileNumber);
   }
 
 
@@ -227,7 +229,11 @@ class _NotificationPageState extends State<NotificationPage> {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => HomePage(mobileNumber: widget.mobileNumber)),
+            // );
           },
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
@@ -242,7 +248,7 @@ class _NotificationPageState extends State<NotificationPage> {
           } else {
             // final List<Map<String, dynamic>> data = snapshot.data!;
             List<Map<String, dynamic>> data = snapshot.data!;
-            data.sort((a, b) => DateTime.parse(b['ord_date']).compareTo(DateTime.parse(a['ord_date'])));
+            data.sort((a, b) => DateTime.parse(b['dated']).compareTo(DateTime.parse(a['dated'])));
 
 
 
@@ -252,11 +258,11 @@ class _NotificationPageState extends State<NotificationPage> {
               itemBuilder: (context, index) {
                 final item = data[index];
                 // Parse the date
-                DateTime orderDate = DateTime.parse(item['ord_date']);
+                DateTime orderDate = DateTime.parse(item['dated']);
                 String formattedDate = DateFormat.yMMMd().format(orderDate);
 
                 // Check if it's a new date, and display it only once
-                if (index == 0 || formattedDate != DateFormat.yMMMd().format(DateTime.parse(data[index - 1]['ord_date']))) {
+                if (index == 0 || formattedDate != DateFormat.yMMMd().format(DateTime.parse(data[index - 1]['dated']))) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -289,64 +295,84 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+// ... (your existing code)
+
   Widget buildNotificationItem(Map<String, dynamic> item) {
     String status = item['status'];
     String orderMessage = '';
+    bool isUnread = item['notification'] == 'unread';
+    String transId = item['trans_id'];
+    bool isUnreadid = !readItemIds.contains(transId); // Check if the item is unread
 
     if (status == 'Cancelled') {
       orderMessage = 'Your order for id ${item['trans_id']} has been Canceled.';
     } else if (status == 'Order Placed') {
       orderMessage = 'Your order for id ${item['trans_id']} has been Placed Successfully. It will soon be Dispatched.';
     } else if (status == 'Delivered') {
-      orderMessage =
-      'Your order for id ${item['trans_id']} has been Delivered Successfully.';
+      orderMessage = 'Your order for id ${item['trans_id']} has been Delivered Successfully.';
     } else if (status == 'Delivery Failed') {
-      orderMessage =
-      'Delivery Failed for order id ${item['trans_id']}.';
+      orderMessage = 'Delivery Failed for order id ${item['trans_id']}.';
     }
 
-    return GestureDetector(
-      onTap: () {
-        // Handle the tap event here, for example, navigate to a new screen
+    return InkWell(
+      // onTap:() {
+      //   // Handle the long press event here
+      //   // Fetch additional data or perform other actions
+      //   fetchAdditionalNotificationData(item['trans_id']);
+      //   // Update the set of read items and rebuild the widget
+      //   setState(() {
+      //     readItemIds.add(item['trans_id']);
+      //   });
+      // },
+      onLongPress: () {
+        // Handle the long press event here
+        // Fetch additional data or perform other actions
         fetchAdditionalNotificationData(item['trans_id']);
+        // Update the set of read items and rebuild the widget
+        setState(() {
+          readItemIds.add(item['trans_id']);
+        });
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListTile(
-              contentPadding: EdgeInsets.all(0), // Remove ListTile's default padding
-              leading: Icon(
-                Icons.notifications,
-                color: Colors.green,
-                size: 30,
-              ),
-              title: Text(
-                status,
-                style: TextStyle(fontWeight: FontWeight.bold,
-                  color: (status == 'Cancelled' || status == 'Delivery Failed') ? Colors.red : Colors.green,
+            Container(
+              color: isUnread ? Colors.blue.withOpacity(0.2) : Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.all(0), // Remove ListTile's default padding
+                leading: CircleAvatar(
+                  backgroundColor: isUnread ? Colors.transparent : Colors.grey.shade100,
+                  radius: 40,
+                  child: Icon(
+                    Icons.notifications,
+                    color: Colors.green,
+                    size: 38,
+                  ),
                 ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Text(
-                  //   'Order ID: ${item['trans_id']}',
-                  //   style: TextStyle(color: Colors.grey),
-                  // ),
-                  if (orderMessage.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        orderMessage,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          // color: status == 'Cancelled' ? Colors.red : Colors.green,
+                title: Text(
+                  status,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: (status == 'Cancelled' || status == 'Delivery Failed') ? Colors.red : Colors.green,
+                  ),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (orderMessage.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          orderMessage,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -355,23 +381,32 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+// ... (your existing code)
+
   Future<void> fetchAdditionalNotificationData(String transId) async {
     try {
       final response = await http.post(
         Uri.parse('https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=notify'),
-        body: {'mobile': widget.mobileNumber, 'trans_id': transId},
+        body: {
+          'mobile': widget.mobileNumber,
+          'trans_id': transId
+        },
       );
 
       print('API Response: ${response.body}'); // Print the response for debugging
 
       if (response.statusCode == 200) {
-        Fluttertoast.showToast(
-          msg: 'The Id $transId is Read',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-        );
+
+        // setState(() {
+        //   readItemIds.remove(transId);
+        // });
+        // Fluttertoast.showToast(
+        //   msg: 'The Id $transId is Read',
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.BOTTOM,
+        //   backgroundColor: Colors.green,
+        //   textColor: Colors.white,
+        // );
         // Check if the response is the expected "Done" string
         if (response.body == 'Done') {
           // Show a message or perform actions accordingly

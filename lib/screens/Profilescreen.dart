@@ -321,7 +321,7 @@ class ProfileActions extends StatelessWidget {
 
       ListTile(
         leading: Icon(Icons.credit_card, color: Colors.green),
-        title: Text('Manage Address'),
+        title: Text('Payment Methods'),
         trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
         // onTap: () {
         //   // Use the addressInfo here
