@@ -87,10 +87,96 @@ class FavoritesScreen extends StatefulWidget {
   _FavoritesPageState createState() => _FavoritesPageState();
 }
 
-class _FavoritesPageState extends State<FavoritesScreen> {
+// class _FavoritesPageState extends State<FavoritesScreen>
+//     with SingleTickerProviderStateMixin {
+//   List<Map<String, dynamic>> favoriteItems = [];
+//   late AnimationController _dismissController = AnimationController(
+//     vsync: this,
+//     duration: Duration(seconds: 5),
+//   );
+//
+//   late final Animation<Offset> _offsetAnimation = Tween<Offset>(
+//     begin: const Offset(0, 0),
+//     end: Offset(1, 0),
+//   ).animate(
+//     CurvedAnimation(parent: _dismissController, curve: Curves.ease),
+//   );
+//
+//   @override
+//   void dispose() {
+//     _dismissController.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     // Add a listener to detect when the animation completes
+//     _dismissController.addStatusListener((status) {
+//       if (status == AnimationStatus.completed) {
+//         // Animation has completed, delay for 2 seconds and then dispose the controller
+//         Future.delayed(Duration(seconds: 2), () {
+//           _dismissController.dispose();
+//         });
+//       }
+//     });
+//
+//     // Start the animation
+//     _dismissController.forward();
+//     fetchFavoriteItems();
+//   }
+class _FavoritesPageState extends State<FavoritesScreen>
+    with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> favoriteItems = [];
+  late AnimationController _animationController;
+  // late Animation<Offset> _enterAnimation;
+  late Animation<Offset> _exitAnimation;
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    _exitAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-1, 0),
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
+
+    // Add a listener to detect when the animation completes
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reset();
+      }
+    });
+
+    // _animationController.forward();
+
+    // Fetch favorite items when the widget is initialized
+    fetchFavoriteItems();
+    // Delay the animation start by 1 second
+    Future.delayed(Duration(seconds: 2), () {
+      _animationController.forward();
+    });
+  }
 
 
+
+
+  // bool showTutorial = true; // Initially show the tutorial
 
   void navigateToProductDetails(Map<String, dynamic> productInfo) {
     final product = Product(
@@ -113,12 +199,19 @@ class _FavoritesPageState extends State<FavoritesScreen> {
       ),
     );
   }
-    @override
-  void initState() {
-    super.initState();
-    // Fetch favorite items when the widget is initialized
-    fetchFavoriteItems();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Fetch favorite items when the widget is initialized
+  //   fetchFavoriteItems();
+  //   // _dismissController = AnimationController(
+  //   //   vsync: this,
+  //   //   duration: Duration(seconds: 2),
+  //   // );
+  //   // Set showTutorial to true initially
+  //
+  // }
+
 
   void fetchFavoriteItems() async {
     if (widget.mobileNumber == null || widget.mobileNumber.isEmpty) {
@@ -226,148 +319,106 @@ class _FavoritesPageState extends State<FavoritesScreen> {
       Column(
         children: [
           Expanded(
-            child:
-              ListView.builder(
-                itemCount: favoriteItems.length,
-                itemBuilder: (context, index) {
-                  final cartItem = favoriteItems[index];
-                  return Dismissible(
-                    key: Key(cartItem['product_id'].toString()),
-                    onDismissed: (direction) {
-                      removeFromFavorites(cartItem);
+            child: ListView.builder(
+              itemCount: favoriteItems.length,
+              itemBuilder: (context, index) {
+                final cartItem = favoriteItems[index];
+                return Stack(
 
-                    },
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.only(right: 16.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
+                  children: [
+
+                  Card(
+                  elevation: 3,
+                  margin: EdgeInsets.symmetric(vertical: 9, horizontal: 12),
+                  child: Container(
+                    color: Colors.red,
+                    alignment: Alignment.bottomLeft, // Center the content vertically
+                    padding: EdgeInsets.only(left: 14.0, bottom: 45), // Adjusted for alignment left
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
                     ),
-                    child: Card(
-                      elevation: 3,
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        leading: Container(
-                          width: 50.0,
-                          height: 100.0,
-                          child: Image.network(
-                            'https://apip.trifrnd.com/fruits/${cartItem['product_image'] ?? ''}', // Use '' or a default image URL if 'product_image' is null
-                            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                              return Container(
-                                color: Colors.white70,
-                                child: Icon(
-                                  Icons.error,
-                                  color: Colors.red,
-                                ),
-                              );
-                            },
+                  ),
+                ),
+
+                    for (int i = 0; i < 2; i++)
+                      SlideTransition(
+                        position: Tween<Offset>(
+                          begin: i == 0 ? const Offset(0, 0) : const Offset(0.15, 0),  // Start from the zero position or half left
+                          end: i == 0 ? const Offset(0.15, 0) : const Offset(0, 0),   // Move to half right or end at the zero position
+                        ).animate(_animationController),
+                        child: i == 0
+                            ? Dismissible(
+                          key: Key(cartItem['product_id'].toString()),
+                          onDismissed: (direction) {
+                            removeFromFavorites(cartItem);
+                          },
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerLeft,
+                            padding: EdgeInsets.only(right: 14.0),
+                            child: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        title: Text('${cartItem['product_title'] ?? ''}'), // Use '' or a default title if 'product_title' is null
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${cartItem['price'] ?? ''}', // Use '' or a default price if 'price' is null
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
+                          child: Card(
+                            elevation: 3,
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                            child: ListTile(
+                              leading: Container(
+                                width: 50.0,
+                                height: 100.0,
+                                child: Image.network(
+                                  'https://apip.trifrnd.com/fruits/${cartItem['product_image'] ?? ''}',
+                                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                                    return Container(
+                                      color: Colors.white70,
+                                      child: Icon(
+                                        Icons.error,
+                                        color: Colors.red,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              title: Text('${cartItem['product_title'] ?? ''}'),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${cartItem['price'] ?? ''}',
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10,),
+                                ],
+                              ),
+                              trailing: ElevatedButton(
+                                onPressed: () {
+                                  navigateToProductDetails(cartItem);
+                                },
+                                child: Text('Buy Now'),
                               ),
                             ),
-                            SizedBox(height: 10,),
-                          ],
-                        ),
-                          trailing:
-                          ElevatedButton(
-                            onPressed: () {
-                              // Navigate to ProductDetailsPageFromAPI with product information
-                              navigateToProductDetails(cartItem);
-                            },
-                            // style: ElevatedButton.styleFrom(
-                            //   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                            //   textStyle: TextStyle(fontSize: 12),
-                            // ),
-                            child: Text('Buy Now'),
                           ),
-                          // Row(
-                          //   mainAxisSize: MainAxisSize.min,
-                          //   children: [
-                          //
-                          //     // SizedBox(width: 8),
-                          //     // ElevatedButton(
-                          //     //   onPressed: () {
-                          //     //     // Implement the logic to remove the item from favorites
-                          //     //     removeFromFavorites(cartItem);
-                          //     //   },
-                          //     //   style: ElevatedButton.styleFrom(
-                          //     //     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          //     //     textStyle: TextStyle(fontSize: 12),
-                          //     //   ),
-                          //     //   child: Text('Remove'),
-                          //     // ),
-                          //   ],
-                          // ),
+                        )
+                            : Container(),
                       ),
-                    ),
-                  );
-                },
-              ),
-            // ListView.builder(
-            //   itemCount: favoriteItems.length,
-            //   itemBuilder: (context, index) {
-            //     final favoriteItem = favoriteItems[index];
-            //     return Dismissible(
-            //       key: Key(favoriteItem['product_id'].toString()),
-            //       onDismissed: (direction) {
-            //         // Implement the logic to remove the item from favorites
-            //         removeFromFavorites(favoriteItem);
-            //       },
-            //       background: Container(
-            //         color: Colors.red,
-            //         alignment: Alignment.centerRight,
-            //         padding: EdgeInsets.only(right: 16.0),
-            //         child: Icon(
-            //           Icons.delete,
-            //           color: Colors.white,
-            //         ),
-            //       ),
-            //       child:
-            //       Card(
-            //         elevation: 3,
-            //         margin: EdgeInsets.symmetric(vertical: 8),
-            //         child: ListTile(
-            //           title: Text('${favoriteItem['product_title']}'),
-            //           // Add other information as needed
-            //         ),
-            //       ),
-            //     );
-            //   },
-            // )
-
-
-// ... (Your existing code)
-
-// Function to navigate to ProductDetailsPageFromAPI with product information
-
+                  ],
+                );
+              },
+            ),
           ),
         ],
       )
-      // ListView.builder(
-      //   itemCount: favoriteItems.length,
-      //   itemBuilder: (context, index) {
-      //     final favoriteItem = favoriteItems[index];
-      //     return ListTile(
-      //       title: Text('${favoriteItem['product_title']}'),
-      //       // Add other information as needed
-      //     );
-      //   },
-      // ),
+
     );
   }
+
   void removeFromFavorites(Map<String, dynamic> productInfo) async {
     final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=remfav';
 
@@ -393,5 +444,4 @@ class _FavoritesPageState extends State<FavoritesScreen> {
       print('Failed to remove from favorites. Error: ${response.body}');
     }
   }
-
 }

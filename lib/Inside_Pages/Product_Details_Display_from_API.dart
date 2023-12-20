@@ -186,15 +186,15 @@ class _ProductDetailsPageFromAPIState extends State<ProductDetailsPageFromAPI> {
       );
 
       // Navigate to the cart
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FavoritesScreen(
-            mobileNumber: widget.mobileNumber,
-            // product: widget.product,
-          ),
-        ),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => FavoritesScreen(
+      //       mobileNumber: widget.mobileNumber,
+      //       // product: widget.product,
+      //     ),
+      //   ),
+      // );
     } catch (error) {
       // Handle errors
       print('Error: $error');
