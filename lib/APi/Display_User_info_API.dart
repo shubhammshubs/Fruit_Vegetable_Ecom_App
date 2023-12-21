@@ -22,3 +22,30 @@ class ApiServiceaddress {
     }
   }
 }
+
+
+
+
+class UserImageApi {
+  Future<Map<String, dynamic>> fetchUserData(String mobileNumber) async {
+    final apiUrl = "https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=userimg";
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {"mobile": mobileNumber},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else {
+        // Handle the case when the API call fails or returns an error
+        throw Exception('Failed to load user data');
+      }
+    } catch (error) {
+      // Handle the case when an error occurs during the API call
+      throw Exception('Error: $error');
+    }
+  }
+}

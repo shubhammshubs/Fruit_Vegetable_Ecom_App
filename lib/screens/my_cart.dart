@@ -23,10 +23,19 @@ class AddToCartPage extends StatefulWidget {
   _AddToCartPageState createState() => _AddToCartPageState();
 }
 
+class _AddToCartPageState extends State<AddToCartPage>
 
-
-class _AddToCartPageState extends State<AddToCartPage> {
+    with SingleTickerProviderStateMixin {
+  List<Map<String, dynamic>> favoriteItems = [];
+  late AnimationController _animationController;
+  late Animation<Offset> _exitAnimation;
   List<Map<String, dynamic>> cartItems = [];
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   double calculateTotalPrice() {
     double totalPrice = 0.0;
@@ -45,10 +54,33 @@ class _AddToCartPageState extends State<AddToCartPage> {
     super.initState();
     // Fetch cart items when the widget is initialized
     fetchCartItems();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    _exitAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-1, 0),
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
+
+    // Add a listener to detect when the animation completes
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reset();
+      }
+    });
+
+    // Delay the animation start by 1 second
+    Future.delayed(Duration(seconds: 2), () {
+      _animationController.forward();
+    });
   }
 
   void fetchCartItems() async {
-    // ... (your existing code)
 
     if (widget.mobileNumber == null || widget.mobileNumber.isEmpty) {
       // ... (your existing code for showing the login dialog)
@@ -84,103 +116,6 @@ class _AddToCartPageState extends State<AddToCartPage> {
       print('Failed to fetch cart items. Error: ${response.body}');
     }
   }
-  //   if (response.statusCode == 200) {
-  //     // Parse the response body
-  //     final List<dynamic> data = json.decode(response.body);
-  //
-  //     // Update the state with the cart items
-  //     setState(() {
-  //       cartItems = List<Map<String, dynamic>>.from(data);
-  //     });
-  //   } else {
-  //     // Handle the error
-  //     print('Failed to fetch cart items. Error: ${response.body}');
-  //   }
-  // }
-
-  // Future<String?> showPaymentIdDialog(BuildContext context) async {
-  //   TextEditingController paymentIdController = TextEditingController();
-  //
-  //   return showDialog<String>(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Enter Payment ID'),
-  //         content: TextField(
-  //           controller: paymentIdController,
-  //           decoration: InputDecoration(
-  //             hintText: 'Enter payment ID',
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop(paymentIdController.text);
-  //             },
-  //             child: Text('OK'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-  // Future<void> handleCheckout() async {
-  //   final apiUrl = 'https://apip.trifrnd.com/Fruits/vegfrt.php?apicall=addorder';
-  //
-  //   final transId = '${DateTime.now().millisecondsSinceEpoch}'; // Generate a custom transaction ID
-  //
-  //   // Show pop-up dialog to get payment ID
-  //   final paymentId = await showPaymentIdDialog(context);
-  //   if (paymentId == null || paymentId.isEmpty) {
-  //     // User canceled or didn't enter payment ID
-  //     print('Checkout canceled by the user.');
-  //     return;
-  //   }
-  //
-  //   for (var cartItem in cartItems) {
-  //     final response = await http.post(
-  //       Uri.parse(apiUrl),
-  //       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-  //       body: {
-  //         'mobile': widget.mobileNumber,
-  //         'product_id': cartItem['product_id'] ?? '',
-  //         'quantity': cartItem['quantity'] ?? '0',
-  //         'product_image': cartItem['product_image'] ?? '',
-  //         'product_title': cartItem['product_title'] ?? '',
-  //         'price': cartItem['price'] ?? '',
-  //         'ord_price': calculateTotalPrice().toStringAsFixed(2),
-  //         'trans_id': transId,
-  //         'payment_id': paymentId,
-  //       }..removeWhere((key, value) => value == null), // Remove null values from the body
-  //     );
-  //
-  //     print('API Response: ${response.statusCode}');
-  //     print('API Body: ${response.body}');
-  //
-  //     if (response.statusCode == 200 &&
-  //         response.body == 'Successfully added to Cart.') {
-  //       // Successfully added to Cart. Show a message.
-  //       final snackBar = SnackBar(
-  //         content: Text(
-  //           'Item ${cartItem['product_title']} added to Cart.',
-  //           textAlign: TextAlign.center,
-  //         ),
-  //       );
-  //       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //     } else {
-  //       print('Failed to upload item to the order. Error: ${response.body}');
-  //     }
-  //   }
-  //
-  //   // Navigate to the homepage
-  //   Navigator.pushReplacement(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => HomePage(mobileNumber: widget.mobileNumber)),
-  //   );
-  // }
-  //
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -244,83 +179,91 @@ class _AddToCartPageState extends State<AddToCartPage> {
               itemCount: cartItems.length,
               itemBuilder: (context, index) {
                 final cartItem = cartItems[index];
-                return Dismissible(
-                  key: Key(cartItem['product_id'].toString()),
-                  onDismissed: (direction) {
-                    removeFromCart(cartItem);
-
-                  },
-                  background: Container(
+                return Stack(
+                  children:[
+                  Card(
+                  elevation: 3,
+                  margin: EdgeInsets.symmetric(vertical: 9, horizontal: 12),
+                  child: Container(
                     color: Colors.red,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.only(right: 16.0),
+                    alignment: Alignment.bottomLeft, // Center the content vertically
+                    padding: EdgeInsets.only(left: 14.0, bottom: 45), // Adjusted for alignment left
                     child: Icon(
                       Icons.delete,
                       color: Colors.white,
                     ),
                   ),
-                  child: Card(
-                    elevation: 3,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      leading: Container(
-                        width: 50.0,
-                        height: 100.0,
-                        child: Image.network(
-                          'https://apip.trifrnd.com/fruits/${cartItem['product_image']}',
-                          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                            return Container(
-                              color: Colors.white70,
-                              child: Icon(
-                                Icons.error,
-                                color: Colors.red,
-                              ),
-                            );
-                          },
-                        ),
+                ),
+
+                for (int i = 0; i < 2; i++)
+                SlideTransition(
+                position: Tween<Offset>(
+                begin: i == 0 ? const Offset(0, 0) : const Offset(0.15, 0),  // Start from the zero position or half left
+                end: i == 0 ? const Offset(0.15, 0) : const Offset(0, 0),   // Move to half right or end at the zero position
+                ).animate(_animationController),
+                child: i == 0
+                ? Dismissible(
+                    key: Key(cartItem['product_id'].toString()),
+                    onDismissed: (direction) {
+                      removeFromCart(cartItem);
+
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.only(right: 16.0),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
                       ),
-                      title: Text('${cartItem['product_title']}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Price: ${cartItem['price']}',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-                        ],
-                      ),
-                      trailing:
-                      Text('Quantity: ${cartItem['quantity']}'),
-                      // Row(
-                      //   mainAxisSize: MainAxisSize.min,
-                      //   children: [
-                      //     Text('Quantity: ${cartItem['quantity']}'),
-                      //     SizedBox(width: 8),
-                      //     ElevatedButton(
-                      //       onPressed: () {
-                      //         // Implement the logic to remove the item from the cart
-                      //         removeFromCart(cartItem);
-                      //       },
-                      //       style: ElevatedButton.styleFrom(
-                      //         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      //         textStyle: TextStyle(fontSize: 12),
-                      //       ),
-                      //       child: Text('Remove'),
-                      //     ),
-                      //   ],
-                      // ),
                     ),
-                  ),
+                    child: Card(
+                      elevation: 3,
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      child: ListTile(
+                        leading: Container(
+                          width: 50.0,
+                          height: 100.0,
+                          child: Image.network(
+                            'https://apip.trifrnd.com/fruits/${cartItem['product_image']}',
+                            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                              return Container(
+                                color: Colors.white70,
+                                child: Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        title: Text('${cartItem['product_title']}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Price: ${cartItem['price']}',
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                          ],
+                        ),
+                        trailing:
+                        Text('Quantity: ${cartItem['quantity']}'),
+
+                      ),
+                    ),
+                 )  : Container(),
+                ),
+                ]
                 );
               },
             ),
           ),
           BottomAppBar(
-            // ... (other BottomAppBar properties remain the same)
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -332,21 +275,11 @@ class _AddToCartPageState extends State<AddToCartPage> {
                     color: Colors.green,
                   ),
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     APIService.handleCheckout(
-                //       mobileNumber: widget.mobileNumber,
-                //       cartItems: cartItems,
-                //       context: context,
-                //     );                  },
-                //   child: Text('Checkout'),
-                // ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>
                         PaymentMethodsPage(
                           mobileNumber: widget.mobileNumber, cartItems: cartItems,
-
                         )));
                   },
                   child: Text('Checkout'),
@@ -356,7 +289,6 @@ class _AddToCartPageState extends State<AddToCartPage> {
           ),
         ],
       ),
-
     );
   }
   void removeFromCart(Map<String, dynamic> cartItem) async {

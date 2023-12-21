@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../Inside_Pages/ProductListPage.dart';
+import '../draft_page.dart';
 
 class CategoryPage extends StatelessWidget {
   final String mobileNumber;
@@ -27,7 +28,7 @@ class CategoryPage extends StatelessWidget {
         children: [
           Container(
             // padding: const EdgeInsets.all(5.0),
-            child: SearchBartool(),
+            child: SearchBartool(mobileNumber: mobileNumber,),
           ),
           SizedBox(height: 30,),
           Expanded(

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import '../APi/Display_User_info_API.dart';
 import '../APi/Notification_API.dart';
 import '../Inside_Pages/Notification_page.dart';
+import '../draft_page.dart';
 import '../widgets/best_deals_slider.dart';
 import '../widgets/category_slider.dart';
 import '../widgets/image_slider.dart';
@@ -216,10 +217,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-
+//            Text('Mobile: $mobileNumber'),
               Container(
                 // height: 200.0, // Set a suitable height
-                child: SearchBartool(),
+                child: SearchBartool(mobileNumber: widget.mobileNumber,),
               ),
 
               SizedBox(height: 25,),

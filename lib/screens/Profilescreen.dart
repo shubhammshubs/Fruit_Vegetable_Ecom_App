@@ -5,7 +5,9 @@ import '../APi/Add_To_Cart_API.dart';
 import '../APi/Display_User_info_API.dart';
 import '../HomePage1.dart';
 import '../User_Credentials/login_Screen.dart';
+import '../draft_page.dart';
 import '../widgets/AddressPopUp.dart';
+import '../widgets/search_bar.dart';
 import 'Check_Out_Screen/Delivery_Address.dart';
 import 'ProfilePage_Screens/Manage_Address.dart';  // Import ApiService
 
@@ -124,6 +126,21 @@ class TwoColumnLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>>(
+        future: UserImageApi().fetchUserData(mobileNumber),
+    builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+    // Display a loading indicator while fetching data
+    return Center(child: CircularProgressIndicator());
+    } else if (snapshot.hasError) {
+    // Display an error message if there's an error
+    return Center(child: Text('Unable to load image'));
+    } else if (!snapshot.hasData || snapshot.data == null) {
+    // Display a message when no data is available
+    return Text('User information not available.');
+    } else {
+    // User information is available, display it
+    final userData = snapshot.data!;
     return Row(
       children: [
         Expanded(
@@ -133,9 +150,11 @@ class TwoColumnLayout extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 60,
-                    backgroundImage: AssetImage('assets/images/1.png'),
+                    backgroundImage: NetworkImage(
+                      'https://apip.trifrnd.com/Fruits/${userData['userImage'] ?? ''}',
+                    ),
                     backgroundColor: Colors.white,
                   ),
                   Positioned(
@@ -181,8 +200,12 @@ class TwoColumnLayout extends StatelessWidget {
         Expanded(
           flex: 1,
           child: ProfileActions(mobileNumber: '${mobileNumber}'),
-        ),
-      ],
+
+      ),
+      ]
+      );
+    }
+    },
     );
   }
 }
@@ -194,81 +217,98 @@ class SingleColumnLayout extends StatelessWidget {
   SingleColumnLayout({
     required this.mobileNumber,
     required this.userInfo,
-
   });
-
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Stack(
+    return FutureBuilder<Map<String, dynamic>>(
+      future: UserImageApi().fetchUserData(mobileNumber),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Display a loading indicator while fetching data
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Display an error message if there's an error
+          return Center(child: Text('Unable to load image'));
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          // Display a message when no data is available
+          return Text('User information not available.');
+        } else {
+          // User information is available, display it
+          final userData = snapshot.data!;
+          return SingleChildScrollView(
+            child: Column(
               children: [
-                const CircleAvatar(
-                  radius: 60,
-                  backgroundImage: AssetImage('assets/images/1.png'),
-                  backgroundColor: Colors.white,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: InkWell(
-                    onTap: () {
-                      // Handle the "Edit Profile" action here
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: NetworkImage(
+                          'https://apip.trifrnd.com/Fruits/${userData['userImage'] ?? ''}',
+                        ),
+                        backgroundColor: Colors.white,
                       ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: () {
+                            // Handle the "Edit Profile" action here
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 10),
+                Text(
+                  '${userInfo['username']}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Mobile : $mobileNumber',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'email :${userInfo['email']}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                // Text(
+                //   '${userInfo['city']},${userInfo['state']}',
+                //   style: const TextStyle(
+                //     fontSize: 18,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
+                // Move the ProfileActions widget inside the SingleChildScrollView
+                ProfileActions(mobileNumber: mobileNumber),
               ],
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '${userInfo['username']}',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            'Mobile : $mobileNumber',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            'email :${userInfo['email']}',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          // Text(
-          //   '${userInfo['city']},${userInfo['state']}',
-          //   style: const TextStyle(
-          //     fontSize: 18,
-          //     fontWeight: FontWeight.bold,
-          //   ),
-          // ),
-
-          // Move the ProfileActions widget inside the SingleChildScrollView
-          ProfileActions(mobileNumber: mobileNumber),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
 }
@@ -323,10 +363,16 @@ class ProfileActions extends StatelessWidget {
         leading: Icon(Icons.credit_card, color: Colors.green),
         title: Text('Payment Methods'),
         trailing: Icon(Icons.arrow_forward_ios_rounded, color: Colors.green),
-        // onTap: () {
-        //   // Use the addressInfo here
-        //   AddressPopup.showAddressDialog(context, mobileNumber,);
-        // },
+          // onTap: () {
+          //   // Navigator.push(
+          //   //   context,
+          //   //   MaterialPageRoute(
+          //   //     builder: (context) =>
+          //   //     // DeliveryAddressPage(),
+          //   //     // SearchAnchor1(),
+          //   //   ),
+          //   );
+          // },
       ),
           // Add the rest of your ListTile items here
           const ListTile(
