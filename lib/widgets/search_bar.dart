@@ -91,19 +91,7 @@ class _SearchBartoolState extends State<SearchBartool> {
       }
     } catch (error) {
       // Handle the case when an error occurs during the API call
-      // Handle the case when an error occurs during the API call
       print('Error1: $error');
-      // Handle the case when an error occurs during the API call
-      // print('Error1: $error');
-      // Fluttertoast.showToast(
-      //   msg: 'Product is not available',
-      //   toastLength: Toast.LENGTH_SHORT,
-      //   gravity: ToastGravity.BOTTOM,
-      //   timeInSecForIosWeb: 1,
-      //   backgroundColor: Colors.red,
-      //   textColor: Colors.white,
-      //   fontSize: 16.0,
-      // );
     }
   }
 

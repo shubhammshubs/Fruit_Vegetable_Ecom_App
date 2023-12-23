@@ -44,7 +44,7 @@ class APIService {
       );
 
       print('API Response: ${response.statusCode}');
-      print('API Body: ${response.body}');
+      print('API Body for check out: ${response.body}');
 
       if (response.statusCode == 200 &&
           response.body == "Order placed Successfully.") {
@@ -84,9 +84,10 @@ class APIService {
       MaterialPageRoute(builder: (context) => HomePage(mobileNumber: mobileNumber)),
     );
 
-
-
     }
+
+
+
 
   static double calculateTotalPrice(List<Map<String, dynamic>> cartItems) {
     double totalPrice = 0.0;
